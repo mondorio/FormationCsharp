@@ -43,6 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ex1_ElementaryOperations.cs" />
+    <Compile Include="Ex2_SpeakingClock.cs" />
+    <Compile Include="Ex3_Pyramid.cs" />
+    <Compile Include="Ex4_Factorial.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
