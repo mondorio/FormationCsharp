@@ -13,6 +13,11 @@ namespace Serie1
         static int width;
         static string line = "";
 
+        /// <summary>
+        /// création de piramide
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="isSmooth"></param>
         public static void PyramidConstruction(int n, bool isSmooth)
         {
             if (n <= 0)

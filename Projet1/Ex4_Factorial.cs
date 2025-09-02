@@ -8,6 +8,11 @@ namespace Serie1
 {
     public static class Factorial
     {
+        /// <summary>
+        /// factoriel exemple
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
         public static int Factorial_(int n)
         {
             try
@@ -28,7 +33,11 @@ namespace Serie1
                 return -1;
             }
         }
-
+        /// <summary>
+        /// factoriel recursive 
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
         public static int FactorialRecursive(int n)
         {
             try

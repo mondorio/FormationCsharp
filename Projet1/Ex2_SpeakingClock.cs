@@ -9,6 +9,11 @@ namespace Serie1
     public static class SpeakingClock
     {
         static string message;
+        /// <summary>
+        /// retourne un message en fonction de l'heure de la journée 
+        /// </summary>
+        /// <param name="heure"></param>
+        /// <returns></returns>
         public static string GoodDay(int heure) 
         {
             Console.WriteLine();

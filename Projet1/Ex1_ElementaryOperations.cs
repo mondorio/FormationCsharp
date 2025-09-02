@@ -45,7 +45,7 @@ namespace Serie1
         }
 
         /// <summary>
-        /// reste d'une division de 
+        /// reste d'une division de integer
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
