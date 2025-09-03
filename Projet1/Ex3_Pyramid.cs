@@ -28,14 +28,14 @@ namespace Serie1
 
             width = 2 * n - 1;
 
-            if (isSmooth)
+            for (int j = 1; j < n + 1; j++)
             {
-                for (int j = 1; j < n+1; j++)
-                {
-                    left = n - j + 1;
-                    right = n + j - 1;
+                left = n - j + 1;
+                right = n + j - 1;
 
-                    for (int pos = 1; pos <= width; pos++)
+                for (int pos = 1; pos <= width; pos++)
+                {
+                    if (isSmooth)
                     {
                         if (pos < left || pos > right)
                         {
@@ -43,21 +43,11 @@ namespace Serie1
                         }
                         else
                         {
-                            line+="+";
+                            line += "+";
                         }
-                    }
-                    Console.WriteLine(line);
-                    line = "";
-                }
-            }
-            else
-            {
-                for (int j = 1; j < n + 1; j++)
-                {
-                    left = n - j + 1;
-                    right = n + j - 1;
 
-                    for (int pos = 1; pos <= width; pos++)
+                    }
+                    else
                     {
                         if (pos < left || pos > right)
                         {
@@ -72,9 +62,9 @@ namespace Serie1
                             line += "-";
                         }
                     }
-                    Console.WriteLine(line);
-                    line = "";
                 }
+                Console.WriteLine(line);
+                line = "";
             }
         }
     }
