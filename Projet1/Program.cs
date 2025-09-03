@@ -1,4 +1,5 @@
 ﻿using Serie1;
+using Serie2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,19 +10,109 @@ namespace Projet1
 {
     internal class Program
     {
-
+        static int[] numbers = new int[6] { 1, 2, 3, 4, 5, 6 };
+        static int[] numbers2 = new int[3] { 7 , 8 , 9 };
+        static int[] numb = new int[0] ;
+        static char[,] morpion = new char[3,3] 
+{ //ligne
+    { 'X', 'O', 'X' },
+    { 'X', 'O', 'O' },
+    { 'X', 'X', 'X' }
+};
+        static char[,] morpion2 = new char[3, 3]
+{ // Colonne
+    { 'X', 'O', 'O' },
+    { 'X', 'X', 'O' },
+    { 'X', 'O', 'X' }
+};
+        static char[,] morpion3 = new char[3, 3]
+{//match null
+    { 'X', 'O', 'X' },
+    { 'X', 'O', 'O' },
+    { 'O', 'X', 'X' }
+};
+        static char[,] morpion4 = new char[3, 3]
+{ //non finis
+    { '_', 'O', 'X' },
+    { 'X', 'O', 'O' },
+    { 'O', '_', 'X' }
+};
+        static char[,] morpion5 = new char[3, 3]
+{ // diagonal
+    { 'X', 'O', 'O' },
+    { 'O', 'X', 'O' },
+    { 'X', 'O', 'X' }
+};
         static void Main(string[] args)
         {
-            Tp1();
-            Tp2();
-            Tp3();
-            TP4();
-            TP5();
-            TP6();
+            //serie 1
+             Tp1();
+             Tp2();
+             Tp3();
+             TP4();
+             TP5();
+             TP6();
+
+            //serie 2
+            Tp7();
+            Tp8();
+            Tp9();
         }
 
-        //exec 1
-        static void Tp1()
+        //serie 2
+        static void Tp7()
+        {
+            Console.WriteLine("SumTab");
+            Console.WriteLine(TasksTables.SumTab(numbers));
+            Console.WriteLine(TasksTables.SumTab(numb));
+            Console.WriteLine("OpeTab");
+            Console.WriteLine(string.Join(", ", TasksTables.OpeTab(numbers,'+',2)));
+            Console.WriteLine(string.Join(", ", TasksTables.OpeTab(numbers, '-', 2)));
+            Console.WriteLine(string.Join(", ", TasksTables.OpeTab(numbers, '*', 2)));
+            Console.WriteLine(string.Join(", ", TasksTables.OpeTab(numbers, 't', 2)));
+            Console.WriteLine("ConcatTab");
+            Console.WriteLine(string.Join(", ", TasksTables.ConcatTab(numbers, numbers2)));
+            Console.WriteLine(string.Join(", ", TasksTables.ConcatTab(numbers, numb)));
+            Console.WriteLine(string.Join(", ", TasksTables.ConcatTab(numb, numb)));
+        }
+
+        static void Tp8()
+        {
+
+            Console.WriteLine("-----1-----");
+            Morpion.DisplayMorpion(morpion);
+            Console.WriteLine(Morpion.CheckMorpion(morpion));
+            Console.WriteLine("-----2-----");
+            Morpion.DisplayMorpion(morpion2);
+            Console.WriteLine(Morpion.CheckMorpion(morpion2));
+            Console.WriteLine("-----3-----");
+            Morpion.DisplayMorpion(morpion3);
+            Console.WriteLine(Morpion.CheckMorpion(morpion3));
+            Console.WriteLine("-----4-----");
+            Morpion.DisplayMorpion(morpion4);
+            Console.WriteLine(Morpion.CheckMorpion(morpion4));
+            Console.WriteLine("-----5-----");
+            Morpion.DisplayMorpion(morpion5);
+            Console.WriteLine(Morpion.CheckMorpion(morpion5));
+
+        }
+
+        static void Tp9()
+        {
+            Console.Write("linear : ");
+            Console.WriteLine(Search.LinearSearch(numbers, 5));
+            Console.Write("linear : ");
+            Console.WriteLine(Search.LinearSearch(numb, 5));
+            Console.Write("dichoto : ");
+            Console.WriteLine(Search.BinarySearch(numbers, 6));
+            Console.Write("dichoto : ");
+            Console.WriteLine(Search.BinarySearch(numb, 1));
+
+        }
+
+            //serie 1
+            //exec 1
+            static void Tp1()
         {
             ElementaryOperations.BasicOperation(1, 2, '+');
             ElementaryOperations.BasicOperation(1, 2, '-');
