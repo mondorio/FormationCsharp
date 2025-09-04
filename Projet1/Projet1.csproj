@@ -50,7 +50,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serie2\Ex1_TasksTables.cs" />
-    <Compile Include="Serie2\Ex2_Morpion.cs" />
+    <Compile Include="Serie4\Ex1_ClassCouncil.cs" />
+    <Compile Include="Serie4\Ex2_Morpion.cs" />
     <Compile Include="Serie2\Ex3_Search.cs" />
     <Compile Include="Serie3\Ex1_AdministrativeTasks.cs" />
     <Compile Include="Serie3\Ex2_CesarCode.cs" />
@@ -58,6 +59,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Serie4\moyenne.csv" />
+    <None Include="Serie4\notes.csv" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

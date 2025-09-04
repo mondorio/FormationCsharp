@@ -55,5 +55,22 @@ namespace Serie2
             else if (a == 'O' && b == 'O' && c == 'O') return 2;
             else return 0;
         }
+
+        public static void MorpionGame()
+        {
+            //TODO
+        }
+
+        public static void DisplayMorpion(/*typeGrille grille */)
+        {
+            //TODO
+            return;
+        }
+
+        public static int CheckMorpion(/*typeGrille grille */)
+        {
+            //TODO
+            return -1;
+        }
     }
 }

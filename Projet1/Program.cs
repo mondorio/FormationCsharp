@@ -1,11 +1,13 @@
 ﻿using Serie1;
 using Serie2;
 using Serie3;
+using Serie4;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Serie4.ClassCouncil;
 
 namespace Projet1
 {
@@ -49,24 +51,38 @@ namespace Projet1
         static void Main(string[] args)
         {
             //serie 1
-           /*  Tp1();
-             Tp2();
-             Tp3();
-             TP4();
-             TP5();
-             TP6();
+            /*  Tp1();
+              Tp2();
+              Tp3();
+              TP4();
+              TP5();
+              TP6();
 
-            //serie 2
-            Tp7();
-            Tp8();
-            Tp9();*/
+             //serie 2
+             Tp7();
+             Tp8();
+             Tp9();*/
 
             //serie 3
             //Tp10();
             //Tp11();
-            Tp12();
+            //Tp12();
+            //Tp13();
+            //Tp14();
+
+            //serie 4
+            Tp15();
 
         }
+
+        // serie 4
+        static void Tp15()
+        {
+        //C:\INTM\FormationCsharp\Projet1\Serie4\notes.csv
+            ClassCouncil.SchoolMeans("..\\..\\Serie4\\notes.csv", "..\\..\\Serie4\\moyenne.csv");
+
+        }
+
         //serie 3
         static void Tp10()
         {
@@ -99,6 +115,45 @@ namespace Projet1
             Console.WriteLine(text);
             text = AdministrativeTasks.ChangeDate(text);
             Console.WriteLine(text);
+        }
+
+        static void Tp13()
+        {
+            Cesar c = new Cesar();
+            text = "je s'appel mouloude je suis agent secret";
+            text = c.CesarCode(text);
+            Console.WriteLine(text);
+            text = c.DecryptCesarCode(text);
+            Console.WriteLine(text);
+
+            text = "je suis le mal arrété de rire";
+            text = c.GeneralCesarCode(text, 3);
+            Console.WriteLine(text);
+            text = c.GeneralDecryptCesarCode(text, 3);
+            Console.WriteLine(text);
+        }
+
+        static void Tp14()
+        {
+            int count;
+            text = "JE ne fonctionne pas 879452234é AHAHAHAH";
+            Console.WriteLine(text);
+            Morse morse = new Morse();
+            text = morse.MorseEncryption(text);
+            Console.WriteLine(text);
+            text = "JE SUIS DU MORSE";
+            Console.WriteLine(text);
+            text = morse.MorseEncryption(text);
+            Console.WriteLine(text);
+            count = morse.LettersCount(text);
+            Console.WriteLine("nombre de lettre : " + count);
+            count = morse.WordsCount(text);
+            Console.WriteLine("nombre de mots : " + count);
+            text = morse.MorseTranslation(text);
+            Console.WriteLine("trad : " + text);
+            text = "....=..===..===..===....=........=.=.=....=.=.===...=.=...=.=.=.......===..=.=...=.=.===.......===.===...===.===.===...=.===.=...=.=.=...=...";
+            text = morse.EfficientMorseTranslation(text);
+            Console.WriteLine("trad : " + text);
         }
             //serie 2
             static void Tp7()
