@@ -49,10 +49,13 @@ namespace Serie2
 
         public static int[] ConcatTab(int[] tab1, int[] tab2)
         {
-            if (tab1 == null || tab1.Length == 0 && tab2 == null || tab2.Length == 0) return Array.Empty<int>();
+            // Tu pourrais renvoyer null ou new int[0], après cela fonctionne. 
+            if (tab1 == null || tab1.Length == 0 && tab2 == null || tab2.Length == 0) 
+                return Array.Empty<int>();
 
             int l = tab1.Length + tab2.Length;
             int[] tab3 = new int[l];
+            // Fonctionne
             Array.Copy(tab1,tab3 , tab1.Length);
             Array.Copy(tab2,tab3 , tab2.Length);
             return tab3;

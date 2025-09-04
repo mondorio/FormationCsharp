@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Serie1
 {
+    // OK, rien à dire.
     public static class Factorial
     {
         /// <summary>

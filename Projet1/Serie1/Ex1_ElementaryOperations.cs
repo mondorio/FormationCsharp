@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Serie1
 {
+    // Pas grand chose à dire, code propre et fonctionnel
     public static class ElementaryOperations
     {
 
@@ -61,9 +62,13 @@ namespace Serie1
             int r = a % b;
 
             if (r == 0)
-            { Console.WriteLine($"{a} = {q} * {b}"); }
+            { 
+                Console.WriteLine($"{a} = {q} * {b}"); 
+            }
             else
-            { Console.WriteLine($"{a} = {q} * {b} + {r}"); }
+            { 
+                Console.WriteLine($"{a} = {q} * {b} + {r}"); 
+            }
         }
 
         /// <summary>

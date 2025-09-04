@@ -17,8 +17,9 @@ namespace Serie1
         public static string GoodDay(int heure) 
         {
             Console.WriteLine();
-            Console.WriteLine("Ô Soleil ! Toi sans qui les choses Ne seraient que ce qu'elles sont. Edmond Rostand");
+            Console.WriteLine("Ô Soleil ! Toi sans qui les choses Ne seraient que ce qu'elles sont. Edmond Rostand"); // ^^ 
 
+            // Fonctionne, après il est toujours conseillé d'utiliser les {} après if, esle, for pour éviter les confusions et mauvaises surprises. 
 
             if (heure < 0 || heure > 23)
                 return "Heure invalide";

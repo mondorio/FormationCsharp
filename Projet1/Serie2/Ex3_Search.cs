@@ -10,10 +10,16 @@ namespace Serie2
     {
         public static int LinearSearch(int[] tableau, int valeur)
         {
-            if (tableau == null || tableau.Length == 0) return -1;
-            for( int i = 0; i < tableau.Length; i++)
+            if (tableau == null || tableau.Length == 0)
             {
-                if (tableau[i] == valeur) return i;
+                return -1;
+            }
+            for (int i = 0; i < tableau.Length; i++)
+            {
+                if (tableau[i] == valeur)
+                {
+                    return i;
+                }
             }
             return -1;
         }
@@ -26,9 +32,18 @@ namespace Serie2
             while (left <= right)
             {
                 int mid = left + ((right - left) / 2);
-                if (tableau[mid] == valeur) return mid;
-                if (tableau[mid] < valeur) left = mid + 1;
-                else right = mid - 1;
+                if (tableau[mid] == valeur)
+                {
+                    return mid;
+                }
+                if (tableau[mid] < valeur)
+                {
+                    left = mid + 1;
+                }
+                else
+                {
+                    right = mid - 1;
+                }
             }
             return -1;
         }
