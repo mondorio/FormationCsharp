@@ -1,5 +1,6 @@
 ﻿using Serie1;
 using Serie2;
+using Serie3;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,10 @@ namespace Projet1
 {
     internal class Program
     {
+        static string text = "";
         static int[] numbers = new int[6] { 1, 2, 3, 4, 5, 6 };
         static int[] numbers2 = new int[3] { 7 , 8 , 9 };
+        static string[] caviardage = new string[4] { "crack", "islamophobes", "xénophobes", "camarades" };
         static int[] numb = new int[0] ;
         static char[,] morpion = new char[3,3] 
 { //ligne
@@ -46,7 +49,7 @@ namespace Projet1
         static void Main(string[] args)
         {
             //serie 1
-             Tp1();
+           /*  Tp1();
              Tp2();
              Tp3();
              TP4();
@@ -56,11 +59,49 @@ namespace Projet1
             //serie 2
             Tp7();
             Tp8();
-            Tp9();
+            Tp9();*/
+
+            //serie 3
+            //Tp10();
+            //Tp11();
+            Tp12();
+
+        }
+        //serie 3
+        static void Tp10()
+        {
+
+            text = AdministrativeTasks.EliminateSeditiousThoughts("je suis chauve et j'aime beaucoup le coca et le crack, " +
+            "j'en fume beaucoup avec mes collègues islamophobes et xénophobes. Des vrais camarades.", caviardage);
+            Console.WriteLine(text);
         }
 
-        //serie 2
-        static void Tp7()
+        static void Tp11()
+        {
+            Console.WriteLine("tp11 : ");
+            text = "M.  Jean-pascal Pilote      23";
+            Console.Write(text + " : ");
+            Console.WriteLine(AdministrativeTasks.ControlFormat(text));
+            text = "M.  Renoir      Pepito      99";
+            Console.Write(text + " : ");
+            Console.WriteLine(AdministrativeTasks.ControlFormat(text));
+            text = "Mme anthoinette delacour    55";
+            Console.Write(text + " : ");
+            Console.WriteLine(AdministrativeTasks.ControlFormat(text));
+            text = "Mme gzaef*15fds  chong chin 25";
+            Console.Write(text + " : ");
+            Console.WriteLine(AdministrativeTasks.ControlFormat(text));
+        }
+
+        static void Tp12()
+        {
+            text = "2018-02-02 : la cible mange un cookie sur le balcon depuis le 2018-02-01";
+            Console.WriteLine(text);
+            text = AdministrativeTasks.ChangeDate(text);
+            Console.WriteLine(text);
+        }
+            //serie 2
+            static void Tp7()
         {
             Console.WriteLine("SumTab");
             Console.WriteLine(TasksTables.SumTab(numbers));
@@ -114,26 +155,29 @@ namespace Projet1
             //exec 1
             static void Tp1()
         {
+            Console.Write("TP1 : ");
             ElementaryOperations.BasicOperation(1, 2, '+');
             ElementaryOperations.BasicOperation(1, 2, '-');
             ElementaryOperations.BasicOperation(1, 2, '*');
             ElementaryOperations.BasicOperation(1, 2, '/');
             ElementaryOperations.BasicOperation(8, 0, '/');
             ElementaryOperations.BasicOperation(1, 2, 'T');
-            Console.ReadLine();
+            
         }
 
         static void Tp2()
         {
+            Console.Write("TP2 : ");
             ElementaryOperations.IntegerDivision(2, 4);
             ElementaryOperations.IntegerDivision(2, 2);
             ElementaryOperations.IntegerDivision(125, 6);
             ElementaryOperations.IntegerDivision(5, 0);
-            Console.ReadLine();
+            
         }
 
         static void Tp3()
         {
+            Console.Write("TP3 : ");
             ElementaryOperations.Pow(2, 2);
             ElementaryOperations.Pow(2, -3);
             ElementaryOperations.Pow(2, 0);
