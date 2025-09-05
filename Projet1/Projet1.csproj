@@ -56,6 +56,7 @@
     <Compile Include="Serie3\Ex1_AdministrativeTasks.cs" />
     <Compile Include="Serie3\Ex2_CesarCode.cs" />
     <Compile Include="Serie3\Ex3_MorseCode.cs" />
+    <Compile Include="test\Bataille.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

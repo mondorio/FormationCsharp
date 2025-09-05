@@ -18,7 +18,7 @@ namespace Serie4
         }
         static List<Notes> notes = new List<Notes>();
 
-        public static void SchoolMeans(string input, string output) // 
+        public static void SchoolMeans(string input, string output) 
         {
 
             CalcMoyenne(ReadFileCsv(input), output);

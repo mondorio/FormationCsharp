@@ -17,10 +17,10 @@ namespace Projet1
     {
         static string text = "";
         static int[] numbers = new int[6] { 1, 2, 3, 4, 5, 6 };
-        static int[] numbers2 = new int[3] { 7 , 8 , 9 };
+        static int[] numbers2 = new int[3] { 7, 8, 9 };
         static string[] caviardage = new string[4] { "crack", "islamophobes", "xénophobes", "camarades" };
-        static int[] numb = new int[0] ;
-        static char[,] morpion = new char[3,3] 
+        static int[] numb = new int[0];
+        static char[,] morpion = new char[3, 3]
 { //ligne
     { 'X', 'O', 'X' },
     { 'X', 'O', 'O' },
@@ -75,13 +75,14 @@ namespace Projet1
             //serie 4
             //Tp15();
             MorpionGame();
+            
 
         }
 
         // serie 4
         static void Tp15()
         {
-        //C:\INTM\FormationCsharp\Projet1\Serie4\notes.csv
+            //C:\INTM\FormationCsharp\Projet1\Serie4\notes.csv
             ClassCouncil.SchoolMeans("..\\..\\Serie4\\notes.csv", "..\\..\\Serie4\\moyenne.csv");
 
         }
@@ -91,8 +92,8 @@ namespace Projet1
             Morpion.MorpionGame();
         }
 
-            //serie 3
-            static void Tp10()
+        //serie 3
+        static void Tp10()
         {
 
             text = AdministrativeTasks.EliminateSeditiousThoughts("je suis chauve et j'aime beaucoup le coca et le crack, " +
@@ -163,14 +164,14 @@ namespace Projet1
             text = morse.EfficientMorseTranslation(text);
             Console.WriteLine("trad : " + text);
         }
-            //serie 2
-            static void Tp7()
+        //serie 2
+        static void Tp7()
         {
             Console.WriteLine("SumTab");
             Console.WriteLine(TasksTables.SumTab(numbers));
             Console.WriteLine(TasksTables.SumTab(numb));
             Console.WriteLine("OpeTab");
-            Console.WriteLine(string.Join(", ", TasksTables.OpeTab(numbers,'+',2)));
+            Console.WriteLine(string.Join(", ", TasksTables.OpeTab(numbers, '+', 2)));
             Console.WriteLine(string.Join(", ", TasksTables.OpeTab(numbers, '-', 2)));
             Console.WriteLine(string.Join(", ", TasksTables.OpeTab(numbers, '*', 2)));
             Console.WriteLine(string.Join(", ", TasksTables.OpeTab(numbers, 't', 2)));
@@ -214,9 +215,9 @@ namespace Projet1
 
         }
 
-            //serie 1
-            //exec 1
-            static void Tp1()
+        //serie 1
+        //exec 1
+        static void Tp1()
         {
             Console.Write("TP1 : ");
             ElementaryOperations.BasicOperation(1, 2, '+');
@@ -225,7 +226,7 @@ namespace Projet1
             ElementaryOperations.BasicOperation(1, 2, '/');
             ElementaryOperations.BasicOperation(8, 0, '/');
             ElementaryOperations.BasicOperation(1, 2, 'T');
-            
+
         }
 
         static void Tp2()
@@ -235,7 +236,7 @@ namespace Projet1
             ElementaryOperations.IntegerDivision(2, 2);
             ElementaryOperations.IntegerDivision(125, 6);
             ElementaryOperations.IntegerDivision(5, 0);
-            
+
         }
 
         static void Tp3()
