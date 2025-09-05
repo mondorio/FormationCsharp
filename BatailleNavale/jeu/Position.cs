@@ -14,22 +14,28 @@
             Y = y;
             Statut = Etat.Caché;
         }
-
+        /// <summary>
+        /// bateau toucher
+        /// </summary>
         public void Touché() 
 		{
-            if (Statut == Etat.Caché)
-                Statut = Etat.Touché;
-        }
+            if (Statut == Etat.Caché) Statut = Etat.Touché;
 
+        }
+        /// <summary>
+        /// bateau coulé
+        /// </summary>
         public void Coulé() 
 		{
             Statut = Etat.Coulé;
         }
-
+        /// <summary>
+        /// tire dans l'eau
+        /// </summary>
         public void Plouf() 
 		{
-            if (Statut == Etat.Caché)
-                Statut = Etat.Plouf;
+            if (Statut == Etat.Caché) Statut = Etat.Plouf;
+
         }
 
     }
