@@ -4,6 +4,8 @@ using Serie3;
 using Serie4;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -71,7 +73,8 @@ namespace Projet1
             //Tp14();
 
             //serie 4
-            Tp15();
+            //Tp15();
+            MorpionGame();
 
         }
 
@@ -83,8 +86,13 @@ namespace Projet1
 
         }
 
-        //serie 3
-        static void Tp10()
+        static void MorpionGame()
+        {
+            Morpion.MorpionGame();
+        }
+
+            //serie 3
+            static void Tp10()
         {
 
             text = AdministrativeTasks.EliminateSeditiousThoughts("je suis chauve et j'aime beaucoup le coca et le crack, " +
