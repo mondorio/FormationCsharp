@@ -1,0 +1,211 @@
+﻿using Argent.Enum;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
+using System.Transactions;
+
+namespace Argent.Serie1
+{
+    public class Banque
+    {
+        private List<Carte> cards = new();
+        private List<Compte> accounts = new();
+        private List<Transaction> transactions = new();
+        private readonly Dictionary<long, DebitWindow> _windows = new();
+        
+
+
+
+        public Banque()
+        {
+
+        }
+        public bool AddCard(long number, int plafond)
+        {
+            Carte card = new Carte(number, plafond);
+            if (cards.Contains(card)) return false;
+            else cards.Add(card);
+            return true;
+        }
+
+        public void afficheCarte()
+        {
+            foreach(var carte in cards)
+            {
+                Console.WriteLine(carte.idCarte + " " + carte.plafond);
+            }
+        }
+
+        public bool AddAccount(int id, long cardNumber, AccountType type, decimal initialBalance)
+        {
+            if (id <= 0 || initialBalance < 0) return false;
+            if (GetCompteById(id) is not null) return false;        // id compte déjà pris ?
+
+            var carte = GetCarteByNumero(cardNumber);               // retrouver la carte par son numéro
+            if (carte is null) return false;                        // la carte doit exister
+
+            var acc = new Compte(id, cardNumber, type, initialBalance );
+            accounts.Add(acc);
+            carte.AddCpt(acc);                                      
+            return true;
+        }
+
+
+        public void afficheAccounts()
+        {
+            foreach (var account in accounts)
+            {
+                Console.WriteLine(account.idCpt + " " + account.numcarte + " " + account.type + " " + account.solde);
+            }
+        }
+
+        public bool AddTransaction(int id, DateTime date, decimal montant, int senderId, int recipientId)
+        {
+            if (id <= 0) return false;
+            // si sender recip 0 ou trouver true
+            bool senderOk = senderId == 0 || GetCompteById(senderId) is not null;  
+            bool recipientOk = recipientId == 0 || GetCompteById(recipientId) is not null;
+            if (!senderOk || !recipientOk) return false;
+
+            var transac = new Transaction(id, date, montant, senderId, recipientId);
+            transactions.Add(transac);
+            return true;
+        }
+        public void afficheTransactios()
+        {
+            foreach (var transac in transactions)
+            {
+                Console.WriteLine(transac.idTransact + " " + transac.date + " " + transac.montant + " " + transac.recipientId + " " + transac.senderId);
+            }
+        }
+
+        public List<string> TraiterTransactions(string pathSortie)
+        {   //pour optimiser la recherche on crée un dictionnaire avec les listes key : id
+            var compteById = accounts.ToDictionary(a => a.idCpt);
+            var carteByNum = cards.ToDictionary(c => c.idCarte);
+
+            var results = new List<string>();
+            var seen = new HashSet<int>();
+            //fabrique la ligne pour le csv (a retiré pour le final)
+             string Fmt(Transaction t, bool ok, string reason = "")
+                => $"{t.idTransact}:{(ok ? "OK" : "KO")};{t.date:dd/MM/yyyy HH:mm:ss};" +
+                   $"{t.montant};{t.senderId};{t.recipientId};{reason}";
+               // => $"{t.idTransact}:{(ok ? "OK" : "KO")};";
+
+
+            foreach (var transaction in transactions.OrderBy(t => t.date))
+            {
+                bool ok = false;
+                string reason = "";
+
+                // 0001 - validations pour être sur
+                //doublon
+                if (!seen.Add(transaction.idTransact))
+                { results.Add(Fmt(transaction, false, "Id dupliqué")); continue; }
+                //montant sup a 0
+                if (transaction.montant <= 0m)
+                { results.Add(Fmt(transaction, false, "Montant <= 0")); continue; }
+                //pas de double 0
+                if (transaction.senderId == 0 && transaction.recipientId == 0)
+                { results.Add(Fmt(transaction, false, "0->0 interdit")); continue; }
+
+                if (transaction.senderId == 0)
+                {
+                    // 0002 - DEPOT: 0 -> Compte
+                    if (compteById.TryGetValue(transaction.recipientId, out var recp))
+                    {
+                        recp.Deposit(transaction.montant);
+                        ok = true;
+                    }
+                    else reason = "Destinataire inexistant";
+                }
+                else if (transaction.recipientId == 0)
+                {
+                    // 0003 - RETRAIT: Compte -> 0 (solde + plafond 10j)
+                    if (!compteById.TryGetValue(transaction.senderId, out var send))
+                        reason = "Expéditeur inexistant";
+                    else if (!carteByNum.TryGetValue(send.numcarte, out var sCard))
+                        reason = "Carte expéditeur introuvable";
+                    else if (!send.CanWithdraw(transaction.montant))
+                        reason = "Solde insuffisant";
+                    else if (!WindowFor(sCard.idCarte).CanDebit(transaction.date, transaction.montant, sCard.plafond))
+                        reason = "Plafond 10j dépassé";
+                    else
+                    {
+                        send.Withdraw(transaction.montant);
+                        WindowFor(sCard.idCarte).Record(transaction.date, transaction.montant);
+                        ok = true;
+                    }
+                }
+                else
+                {
+                    // 0004 - VIREMENT: Compte -> Compte (règles inter-cartes + solde + plafond 10j côté débiteur)
+                    if (!compteById.TryGetValue(transaction.senderId, out var sAcc))
+                        reason = "Expéditeur inexistant";
+                    else if (!compteById.TryGetValue(transaction.recipientId, out var rAcc))
+                        reason = "Destinataire inexistant";
+                    else if (!carteByNum.TryGetValue(sAcc.numcarte, out var sCard))
+                        reason = "Carte expéditeur introuvable";
+                    else if (!carteByNum.TryGetValue(rAcc.numcarte, out var rCard))
+                        reason = "Carte destinataire introuvable";
+                    else
+                    {
+                        bool sameCard = sCard.idCarte == rCard.idCarte;
+                        if (!sameCard && !(sAcc.type == AccountType.Courant && rAcc.type == AccountType.Courant))
+                            reason = "Inter-cartes autorisé uniquement entre comptes Courants";
+                        else if (!sAcc.CanWithdraw(transaction.montant))
+                            reason = "Solde insuffisant";
+                        else if (!WindowFor(sCard.idCarte).CanDebit(transaction.date, transaction.montant, sCard.plafond))
+                            reason = "Plafond 10j dépassé";
+                        else
+                        {
+                            sAcc.Withdraw(transaction.montant);
+                            rAcc.Deposit(transaction.montant);
+                            WindowFor(sCard.idCarte).Record(transaction.date, transaction.montant);
+                            ok = true;
+                        }
+                    }
+                }
+
+                results.Add(Fmt(transaction, ok, reason));
+                //a décommenter si on enleve du main prog final
+                CsvIo.WriteFile(Fmt(transaction, ok, reason), pathSortie);
+            }
+            
+            return results;
+        }
+
+
+
+        private readonly struct Debit
+        {
+            public readonly DateTime When;
+            public readonly decimal Amount;
+            public Debit(DateTime when, decimal amount) { When = when; Amount = amount; }
+        }
+
+        /// <summary>
+        /// regarde avec l'id du compte si il existe, retourne le compte sinon null
+        /// </summary>
+        /// <param name="id">idCpt</param>
+        /// <returns></returns>
+        public Compte? GetCompteById(int id)
+         => accounts.Find(c => c.idCpt == id);
+
+        /// <summary>
+        /// regarde avec l'id de la carte si il existe, retourne le compte sinon null
+        /// </summary>
+        /// <param name="numero">idCarte</param>
+        /// <returns></returns>
+        public Carte? GetCarteByNumero(long numero)
+            => cards.Find(c => c.idCarte == numero);
+
+        private DebitWindow WindowFor(long cardNum)
+    => _windows.TryGetValue(cardNum, out var w) ? w : (_windows[cardNum] = new DebitWindow());
+    }
+}
