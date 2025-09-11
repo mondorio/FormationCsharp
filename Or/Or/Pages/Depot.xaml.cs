@@ -32,7 +32,7 @@ namespace Or.Pages
 
         private void ValiderDepot_Click(object sender, RoutedEventArgs e)
         {
-            if (decimal.TryParse(Montant.Text.Replace(".", ",").Trim(new char[] { '€', ' ' }), out decimal montant) && montant > 0)
+            if (decimal.TryParse(Montant.Text.Replace(".", ",").Trim(new char[] { '€', ' ' }), out decimal montant) )
             {
                 //Compte fictif pour permettre la transaction
                 Compte compteBanque = new Compte(0, 0, TypeCompte.Courant, 0);
@@ -48,12 +48,14 @@ namespace Or.Pages
                 }
                 else
                 {
-                    MessageBox.Show("Opération refusée");
+                    MessageBox.Show(ResultLabels.Label(CodeResultat.MontantNegatifOuZero));
                 }
             }
             else
             {
-                MessageBox.Show("Montant invalide");
+                if (montant <= 0) MessageBox.Show(ResultLabels.Label(CodeResultat.MontantNegatifOuZero));
+                else MessageBox.Show(ResultLabels.Label(CodeResultat.MontantInvalide));
+
             }
         }
     }

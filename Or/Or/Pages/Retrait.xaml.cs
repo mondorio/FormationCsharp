@@ -15,6 +15,7 @@ namespace Or.Pages
     {
         Carte CartePorteur { get; set; }
         Compte ComptePorteur { get; set; }
+        decimal  plafond;
         public Retrait(long numCarte)
         {
             InitializeComponent();
@@ -24,7 +25,9 @@ namespace Or.Pages
             ComptePorteur = SqlRequests.ListeComptesAssociesCarte(CartePorteur.Id).Find(x => x.TypeDuCompte == TypeCompte.Courant);
 
             PlafondMaxRetrait.Text = CartePorteur.Plafond.ToString("C2");
-            Solde.Text = ComptePorteur.Solde.ToString("C2");
+            plafond = CartePorteur.SoldeCarteActuel(DateTime.Now, numCarte);
+            PlafondMaxRetraitActualiser.Text = CartePorteur.SoldeCarteActuel(DateTime.Now, numCarte).ToString("C2");
+            Solde.Text = ComptePorteur.Solde.ToString("C2");          
         }
 
         private void Retour_Click(object sender, RoutedEventArgs e)
@@ -40,20 +43,32 @@ namespace Or.Pages
                 Compte compteBanque = new Compte(0, 0, TypeCompte.Courant, 0);
                 Transaction t = new Transaction(0, DateTime.Now, montant, ComptePorteur.Id, compteBanque.Id);
 
-                if (CartePorteur.EstRetraitAutoriseNiveauCarte(t, compteBanque, ComptePorteur) && ComptePorteur.EstRetraitValide(t))
+                CodeResultat result = CartePorteur.EstRetraitAutoriseNiveauCarte(t, compteBanque, ComptePorteur);
+                if (result == CodeResultat.Ok )
                 {
-                    SqlRequests.EffectuerModificationOperationSimple(t, CartePorteur.Id);
+                    result = ComptePorteur.EstRetraitValide(t);
+                    if ( result == CodeResultat.Ok)
+                    {
+                        if(plafond > t.Montant)
+                        {
+                            SqlRequests.EffectuerModificationOperationSimple(t, CartePorteur.Id);
 
-                    OnReturn(null);
-                }
-                else
-                {
-                    MessageBox.Show("Opération de retrait non authorisée");
-                }
+                            OnReturn(null);
+                        }
+                        else MessageBox.Show(ResultLabels.Label((CodeResultat.PlafondMaxDepasse)));
+                    }
+                    else MessageBox.Show(ResultLabels.Label(result));    
+                }else MessageBox.Show(ResultLabels.Label(result));
+ 
             }
             else
             {
-                MessageBox.Show("Montant invalide");
+                if (montant <= 0)
+                {
+                    MessageBox.Show(ResultLabels.Label(CodeResultat.MontantNegatifOuZero));
+                }
+                else MessageBox.Show(ResultLabels.Label(CodeResultat.MontantInvalide));
+
             }
         }
     }

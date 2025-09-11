@@ -1,7 +1,10 @@
 ﻿using Or.Business;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
+using System.Windows.Navigation;
 
 namespace Or.Models
 {
@@ -13,7 +16,8 @@ namespace Or.Models
         public string NomClient { get; set; }
         public List<int> ListComptesId { get; set; }
         public List<Transaction> Historique { get; private set; }
-        
+        private static readonly TimeSpan Window = TimeSpan.FromDays(10);
+
         public Carte(long id, string prenom, string nom, decimal plafondMax = 0)
         {
             Id = id;
@@ -22,6 +26,21 @@ namespace Or.Models
             Plafond = plafondMax == 0 ? 500 : plafondMax;
             ListComptesId = new List<int>();
             Historique = new List<Transaction>();
+        }
+
+        public decimal SoldeCarteActuel(DateTime now, long numCarte)
+        {
+            var carte = SqlRequests.InfosCarte(numCarte);
+            List<Transaction> trans = SqlRequests.ListeTransactionsAssociesCarte(numCarte);
+            var min = now - Window;
+            decimal plafondcarte = carte.Plafond; 
+            foreach (Transaction t in trans) {
+                if (t.Horodatage >= min && t.Horodatage <= now && t.Destinataire == 0)
+                {
+                    plafondcarte -= t.Montant;   
+                }
+            }
+            return plafondcarte;
         }
 
         public void AlimenterHistoriqueEtListeComptes(List<Transaction> hist, List<int> comptesId)
@@ -46,9 +65,15 @@ namespace Or.Models
         /// <param name="Expediteur"></param>
         /// <param name="Destinataire"></param>
         /// <returns></returns>
-        public bool EstRetraitAutoriseNiveauCarte(Transaction transaction, Compte Expediteur, Compte Destinataire)
+        public CodeResultat EstRetraitAutoriseNiveauCarte(Transaction transaction, Compte Expediteur, Compte Destinataire)
         {
-            return EstOperationAutoriseeContraintesComptes(Expediteur, Destinataire) && EstEligibleMaximumRetraitHebdomadaire(transaction.Montant, transaction.Horodatage);
+            CodeResultat result = EstOperationAutoriseeContraintesComptes(Expediteur, Destinataire);
+            if (result == CodeResultat.Ok)
+            {
+                return EstEligibleMaximumRetraitHebdomadaire(transaction.Montant, transaction.Horodatage);
+            }
+            else return result;
+            
         }
 
         /// <summary>
@@ -57,12 +82,16 @@ namespace Or.Models
         /// <param name="montant"></param>
         /// <param name="dateEffet"></param>
         /// <returns></returns>
-        private bool EstEligibleMaximumRetraitHebdomadaire(decimal montant, DateTime dateEffet)
+        private CodeResultat EstEligibleMaximumRetraitHebdomadaire(decimal montant, DateTime dateEffet)
         {
             List<Transaction> retraitsHisto =
                 Historique.Where(x => x.Expediteur == Id && x.Horodatage > dateEffet.AddDays(-10)).Select(x => x).ToList();
             decimal sommeHisto = montant + retraitsHisto.Sum(x => x.Montant);
-            return sommeHisto < Plafond;
+            if (sommeHisto < Plafond)
+            {
+                return CodeResultat.Ok; 
+            }else return CodeResultat.PlafondMaxDepasse;
+             
         }
 
         /// <summary>
@@ -71,18 +100,18 @@ namespace Or.Models
         /// <param name="Expediteur"></param>
         /// <param name="Destinataire"></param>
         /// <returns></returns>
-        private bool EstOperationAutoriseeContraintesComptes(Compte Expediteur, Compte Destinataire)
+        private CodeResultat EstOperationAutoriseeContraintesComptes(Compte Expediteur, Compte Destinataire)
         {
             // Est-ce que la transaction demandée est possible ?
             if (Tools.EstTransactionExterieure(Expediteur.Id, Destinataire.Id))
             {
-                return false;
+                return CodeResultat.MemeCompteInterdit;
             }
 
             // Opération Interne 
             if (EstOperationInterne(Expediteur.Id, Destinataire.Id))
             {
-                return true;
+                return CodeResultat.Ok;
             }
             // Opération externe
             else
@@ -124,12 +153,15 @@ namespace Or.Models
         /// <param name="Expediteur"></param>
         /// <param name="Destinataire"></param>
         /// <returns></returns>
-        private bool EstOperationExterneAutorise(Compte Expediteur, Compte Destinataire)
+        private CodeResultat EstOperationExterneAutorise(Compte Expediteur, Compte Destinataire)
         {
             Operation operation = Tools.TypeTransaction(Expediteur.Id, Destinataire.Id);
 
-            return operation == Operation.InterCompte &&
-                   Expediteur.TypeDuCompte == TypeCompte.Courant && Destinataire.TypeDuCompte == TypeCompte.Courant ;
+            if (operation == Operation.InterCompte && Expediteur.TypeDuCompte == TypeCompte.Courant && Destinataire.TypeDuCompte == TypeCompte.Courant)
+            {
+                return CodeResultat.Ok;
+            }
+            else return CodeResultat.VirementVersLivretAutreCarteInterdit;
         }
 
     }

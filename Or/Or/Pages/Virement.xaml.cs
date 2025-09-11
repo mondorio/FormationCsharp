@@ -58,19 +58,20 @@ namespace Or.Pages
 
                 Transaction t = new Transaction(0, DateTime.Now, montant, ex.Id, de.Id);
 
-                if ((Expediteur.SelectedItem as Compte).EstRetraitValide(t) && CartePorteur.EstRetraitAutoriseNiveauCarte(t, ex, de))
+                CodeResultat result = (Expediteur.SelectedItem as Compte).EstRetraitValide(t);
+                if (result == CodeResultat.Ok)
                 {
-                    SqlRequests.EffectuerModificationOperationInterCompte(t, ex.IdentifiantCarte, de.IdentifiantCarte);
-                    OnReturn(null);
-                }
-                else
-                {
-                    MessageBox.Show("Opération de virement non autorisé");
-                }
+                    result = CartePorteur.EstRetraitAutoriseNiveauCarte(t, ex, de);
+                    if (result == CodeResultat.Ok)
+                    {
+                        SqlRequests.EffectuerModificationOperationInterCompte(t, ex.IdentifiantCarte, de.IdentifiantCarte);
+                        OnReturn(null);
+                    } else MessageBox.Show(ResultLabels.Label(result));
+                }else MessageBox.Show(ResultLabels.Label(result));
             }
             else
             {
-                MessageBox.Show("Montant invalide");
+                MessageBox.Show(ResultLabels.Label(CodeResultat.MontantInvalide));
             }
 
         }

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-
+using Or.Business;
 namespace Or.Models
 {
     public enum TypeCompte { Courant, Livret }
@@ -41,21 +41,24 @@ namespace Or.Models
         /// </summary>
         /// <param name="transaction"></param>
         /// <returns>Statut du retrait</returns>
-        public bool EstRetraitValide(Transaction transaction)
+        public CodeResultat EstRetraitValide(Transaction transaction)
         {
-            if (EstRetraitAutorise(transaction.Montant))
+            return EstRetraitAutorise(transaction.Montant);
+            /*if (EstRetraitAutorise(transaction.Montant))
             {
                 return true;
             }
             else
             {
                 return false;
-            }
+            }*/
         }
 
-        private bool EstRetraitAutorise(decimal montant)
+        private CodeResultat EstRetraitAutorise(decimal montant)
         {
-            return Solde >= montant && montant > 0;
+            if (montant <= 0) return CodeResultat.MontantNegatifOuZero;
+            else if  (Solde < montant) return CodeResultat.SoldeInsuffisant;
+            else return CodeResultat.Ok;
         }
 
     }

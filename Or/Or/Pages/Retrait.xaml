@@ -16,13 +16,16 @@
         <Label x:Name="labelM" Content="Montant" HorizontalAlignment="Left" Margin="100,180,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.132,-0.27"/>
         <TextBox x:Name="Montant" HorizontalAlignment="Left" Margin="100,210,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Height="22" TextAlignment="Right"/>
 
-        <Label x:Name="labelP" Content="Plafond maximum de retrait" HorizontalAlignment="Left" Margin="466,107,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.132,-0.27"/>
-        <TextBlock x:Name="PlafondMaxRetrait" HorizontalAlignment="Left" Margin="470,136,0,0" TextAlignment="left" TextWrapping="Wrap" VerticalAlignment="Top" Width="150" Background="#FFD2D0D0" Height="20" FontSize="14"/>
+        <Label x:Name="labelP" Content="Plafond maximum de retrait" HorizontalAlignment="Left" Margin="466,59,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.132,-0.27"/>
+        <TextBlock x:Name="PlafondMaxRetrait" HorizontalAlignment="Left" Margin="470,88,0,0" TextAlignment="left" TextWrapping="Wrap" VerticalAlignment="Top" Width="150" Background="#FFD2D0D0" Height="20" FontSize="14"/>
 
         <Label x:Name="labelS" Content="Solde compte courant" HorizontalAlignment="Left" Margin="466,181,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.132,-0.27"/>
         <TextBlock x:Name="Solde" HorizontalAlignment="Left" Margin="470,210,0,0" TextAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="150" Background="#FFD2D0D0" Height="20" FontSize="14"/>
 
         <Button x:Name="Retour" Content="Retour" HorizontalAlignment="Left" Margin="100,330,0,0" VerticalAlignment="Top" Height="30" Width="80" Click="Retour_Click"/>
         <Button x:Name="button" Content="Valider" HorizontalAlignment="Left" Margin="555,330,0,0" VerticalAlignment="Top" Width="80" Height="30" Click="ValiderRetrait_Click"/>
+
+        <Label x:Name="labelPa" Content="Plafond de retrait actualisé" HorizontalAlignment="Left" Margin="466,122,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.132,-0.27"/>
+        <TextBlock x:Name="PlafondMaxRetraitActualiser" HorizontalAlignment="Left" Margin="470,152,0,0" TextAlignment="left" TextWrapping="Wrap" VerticalAlignment="Top" Width="150" Background="#FFD2D0D0" Height="20" FontSize="14"/>
     </Grid>
 </PageFunction>

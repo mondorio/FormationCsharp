@@ -19,9 +19,10 @@
         <TextBlock x:Name="TypeCompte" HorizontalAlignment="Left" Margin="107,175,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="150" Background="#FFD2D0D0" Height="20" FontSize="14"/>
         <TextBlock x:Name="Solde" HorizontalAlignment="Left" Margin="107,200,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="150" Background="#FFD2D0D0" Height="20" FontSize="14"/>
 
-        <ListView x:Name="listView" Margin="330,90,47,131" IsEnabled="False" MaxHeight="500">
+        <ListView x:Name="listView" Margin="330,90,10,132" IsEnabled="False" MaxHeight="500">
             <ListView.Resources>
                 <ec:EuroConverter x:Key="EuroConverter"/>
+                <ec:TypeConverter x:Key="TypeConverter"/>
                 <ec:IsNegativeConverter x:Key="IsNegativeConverter"/>
             </ListView.Resources>
             <ListView.ItemContainerStyle>
@@ -57,7 +58,15 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Montant" Width="100">
+                    <GridViewColumn Header="Type">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Type, Converter={StaticResource TypeConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <GridViewColumn Header="Montant" Width="110">
 
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>

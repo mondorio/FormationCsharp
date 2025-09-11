@@ -7,6 +7,13 @@ using System.Windows.Navigation;
 
 namespace Or.Pages
 {
+    public enum Operation
+    {
+        Depot = 1,
+        Retrait = 2,
+        Virement = 3
+    }
+
     /// <summary>
     /// Logique d'interaction pour DetailsCompte.xaml
     /// </summary>
