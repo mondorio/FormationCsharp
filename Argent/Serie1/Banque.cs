@@ -204,8 +204,8 @@ namespace Argent.Serie1
                 }
 
                 results.Add(Fmt(transaction, ok, reason));
-                //a décommenter si on enleve du main prog final
-                CsvIo.WriteFile(Fmt(transaction, ok, reason), pathSortie);
+
+                //CsvIo.WriteFile(Fmt(transaction, ok, reason), pathSortie);
             }
             
             return results;

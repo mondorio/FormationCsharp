@@ -113,8 +113,10 @@ namespace Argent.Serie1
         /// <param name="pathS"></param>
         /// <param name="bank"></param>
         /// <returns></returns>
-        public static bool LoadTransaction(string path, string pathS, Banque bank)
+        public static bool LoadTransaction(string path, string pathS, Banque bank, out List<string> rejet )
         {
+
+            rejet = new List<string>();
             if (!File.Exists(path)) return false;
 
             //a commenter pour le prog final
@@ -132,35 +134,41 @@ namespace Argent.Serie1
                 var parts = line.Split(';');
                 if (parts.Length < 5)
                 {// verifie qu'on a bien toute les info
-                    WriteFile(Fmt(parts[0].Trim(), "information manquante"), pathS);
+                    rejet.Add(Fmt(parts[0].Trim(), "information manquante"));
+                    //WriteFile(Fmt(parts[0].Trim(), "information manquante"), pathS);
                     continue;
                 }
 
                 if (!int.TryParse(parts[0].Trim(), out int id))
                 {
-                    WriteFile(Fmt(parts[0].Trim(), "mauvais id"), pathS);
+                    rejet.Add(Fmt(parts[0].Trim(), "mauvais id"));
+                    //WriteFile(Fmt(parts[0].Trim(), "mauvais id"), pathS);
                     continue;
                 }
                
                 //06/09/2025 14:05:00
                 if (!DateTime.TryParseExact(parts[1].Trim(),"dd/MM/yyyy HH:mm:ss" , Inv, DateTimeStyles.None, out DateTime date))
                 {
-                    WriteFile(Fmt(parts[0].Trim(), "date erronée"), pathS);
+                    rejet.Add(Fmt(parts[0].Trim(), "date erronée"));
+                    //WriteFile(Fmt(parts[0].Trim(), "date erronée"), pathS);
                     continue;
                 }
                 if (!decimal.TryParse(parts[2].Trim(), Inv, out decimal montant))
                 {
-                    WriteFile(Fmt(parts[0].Trim(), "montant erronée"), pathS);
+                    rejet.Add(Fmt(parts[0].Trim(), "montant erronée"));
+                    //WriteFile(Fmt(parts[0].Trim(), "montant erronée"), pathS);
                     continue;
                 }
                 if (!int.TryParse(parts[3].Trim(), out int idExpe))
                 {
-                    WriteFile(Fmt(parts[0].Trim(), "expediteur erronée"), pathS);
+                    rejet.Add(Fmt(parts[0].Trim(), "expediteur erronée"));
+                    //WriteFile(Fmt(parts[0].Trim(), "expediteur erronée"), pathS);
                     continue;
                 }
                 if (!int.TryParse(parts[4].Trim(), out int idDest))
                 {
-                    WriteFile(Fmt(parts[0].Trim(), "destinataire erronée"), pathS);
+                    rejet.Add(Fmt(parts[0].Trim(), "destinataire erronée"));
+                    //WriteFile(Fmt(parts[0].Trim(), "destinataire erronée"), pathS);
                     continue;
                 }
 
@@ -171,7 +179,8 @@ namespace Argent.Serie1
                 }
                 else
                 {
-                    WriteFile(Fmt(parts[0].Trim(), "Compte non trouver"), pathS);
+                    rejet.Add(Fmt(parts[0].Trim(), "Compte non trouver"));
+                    //WriteFile(Fmt(parts[0].Trim(), "Compte non trouver"), pathS);
                     continue;
                 }
             }
