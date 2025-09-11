@@ -9,35 +9,44 @@ namespace Argent.Serie1
     sealed class DebitWindow
     {
         private static readonly TimeSpan Window = TimeSpan.FromDays(10);
-        private readonly List<(DateTime when, decimal amount)> _ops = new();
-        private int _start = 0;        // premier élément encore dans la fenêtre
-        private decimal _sum = 0m;     // somme des débits dans la fenêtre
+        private readonly List<(DateTime date, decimal amount)> ops = new();
+        private int start = 0;        
+        private decimal sum = 0m;     // somme des débits dans la fenêtre de dates
 
+        /// <summary>
+        /// verifie que l'on peut faire une transaction
+        /// </summary>
+        /// <param name="now"></param>
+        /// <param name="amount"></param>
+        /// <param name="plafond"></param>
+        /// <returns></returns>
         public bool CanDebit(DateTime now, decimal amount, int plafond)
         {
-            Prune(now);
-            return _sum + amount <= plafond;
+            getPlafond(now);
+            return sum + amount <= plafond;
         }
 
-        public void Record(DateTime now, decimal amount)
+        /// <summary>
+        ///  on enregistre uniquement les transaction OK
+        /// </summary>
+        /// <param name="date">date transaction</param>
+        /// <param name="amount">montant de la transaction</param>
+        public void Record(DateTime date, decimal amount)
         {
-            _ops.Add((now, amount));   // on enregistre uniquement les débits ACCEPTÉS
-            _sum += amount;
+            ops.Add((date, amount));   
+            sum += amount;
         }
-
-        private void Prune(DateTime now)
+        /// <summary>
+        /// récupére le plafond encore possible en fonction des 10 dérnier jour
+        /// </summary>
+        /// <param name="now"></param>
+        private void getPlafond(DateTime now)
         {
-            var min = now - Window;    // fenêtre glissante de 10 jours
-            while (_start < _ops.Count && _ops[_start].when <= min)
+            var min = now - Window;   
+            while (start < ops.Count && ops[start].date <= min)
             {
-                _sum -= _ops[_start].amount;
-                _start++;
-            }
-            // Compactage occasionnel pour limiter la mémoire
-            if (_start > 256 && _start > _ops.Count / 2)
-            {
-                _ops.RemoveRange(0, _start);
-                _start = 0;
+                sum -= ops[start].amount;
+                start++;
             }
         }
     }

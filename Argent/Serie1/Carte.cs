@@ -12,36 +12,16 @@ namespace Argent.Serie1
         public int plafond { get; private set; }
         public List<Compte> compteList { get; private set; } = new();
 
-        private readonly List<(DateTime date, decimal amount)> debitList = new();
         public Carte(long idCarte, int plafond)
         {
             this.idCarte = idCarte;
             this.plafond = plafond;
         }
-
+        /// <summary>
+        /// ajoute un compte a notre liste
+        /// </summary>
+        /// <param name="compte"></param>
         public void AddCpt(Compte compte) => compteList.Add(compte);
-
-        public void AddDebit(DateTime date, decimal amount) => debitList.Add((date, amount));
-
-        public decimal SumDebitsInLast10Days(DateTime now)
-        {
-            decimal sum = 0;
-            if (debitList.Count > 0)
-            {
-                DateTime min = now.AddDays(-10);
-
-                foreach (var debit in debitList)
-                {
-                    if(debit.date >= min && debit.date <= now)
-                    {
-                        sum += debit.amount;
-                    }
-                }
-                return sum;
-            }
-            else return -1;
-
-        }
 
     }
 

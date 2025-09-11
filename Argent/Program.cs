@@ -4,10 +4,10 @@ namespace Argent
 {
     internal class Program
     {
-        static string pathCards = "C:\\INTM\\FormationCsharp\\Argent\\Enum\\cartes.csv";
-        static string pathAccounts = "C:\\INTM\\FormationCsharp\\Argent\\Enum\\comptes.csv";
-        static string pathTransaction = "C:\\INTM\\FormationCsharp\\Argent\\Enum\\transactions.csv";
-        static string pathSortie = "C:\\INTM\\FormationCsharp\\Argent\\Enum\\Rejets.csv";
+        static string pathCards = "C:\\INTM\\FormationCsharp\\Argent\\File\\cartes.csv";
+        static string pathAccounts = "C:\\INTM\\FormationCsharp\\Argent\\File\\comptes.csv";
+        static string pathTransaction = "C:\\INTM\\FormationCsharp\\Argent\\File\\transactions.csv";
+        static string pathSortie = "C:\\INTM\\FormationCsharp\\Argent\\File\\Rejets.csv";
         static void Main(string[] args)
         {
             Banque banque = new Banque();
@@ -39,7 +39,7 @@ namespace Argent
         }
 
         /*****************************************************
-         * Suivant le schéma précédent et les contraintes sur les cartes énoncées, lister les diérentes
+         * Suivant le schéma précédent et les contraintes sur les cartes énoncées, lister les diférentes
          *  opérations entre deux comptes autorisées.
          *  Carte 1234… : 1 -> 11 | 1 -> 12 | 11 -> 12 | 11-> 12 | 1->2         
          *  Carte 4567… : 2 -> 21 | 21-> 2 |2->1

@@ -13,18 +13,22 @@ namespace Argent.Serie1
 {
     public class Banque
     {
-        private List<Carte> cards = new();
+        private List<Carte> cards = new();   
         private List<Compte> accounts = new();
         private List<Transaction> transactions = new();
-        private readonly Dictionary<long, DebitWindow> _windows = new();
-        
-
-
+        private Dictionary<long, DebitWindow> debit = new(); //liste de debit par numero de carte
 
         public Banque()
         {
 
         }
+
+        /// <summary>
+        /// ajoute les carte a notre liste et verifie qu'il n'est pas déja crée
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="plafond"></param>
+        /// <returns></returns>
         public bool AddCard(long number, int plafond)
         {
             Carte card = new Carte(number, plafond);
@@ -32,7 +36,9 @@ namespace Argent.Serie1
             else cards.Add(card);
             return true;
         }
-
+        /// <summary>
+        /// affiche nos carte 
+        /// </summary>
         public void afficheCarte()
         {
             foreach(var carte in cards)
@@ -40,7 +46,14 @@ namespace Argent.Serie1
                 Console.WriteLine(carte.idCarte + " " + carte.plafond);
             }
         }
-
+        /// <summary>
+        /// ajoute un compte a notre liste et vérifie qu'il est conforme au attente
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cardNumber"></param>
+        /// <param name="type"></param>
+        /// <param name="initialBalance"></param>
+        /// <returns></returns>
         public bool AddAccount(int id, long cardNumber, AccountType type, decimal initialBalance)
         {
             if (id <= 0 || initialBalance < 0) return false;
@@ -55,7 +68,9 @@ namespace Argent.Serie1
             return true;
         }
 
-
+        /// <summary>
+        /// affiche les comptes
+        /// </summary>
         public void afficheAccounts()
         {
             foreach (var account in accounts)
@@ -64,6 +79,15 @@ namespace Argent.Serie1
             }
         }
 
+        /// <summary>
+        /// ajoute une transaction a notre liste et vérifie qu'il est conforme au attente .
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="date"></param>
+        /// <param name="montant"></param>
+        /// <param name="senderId"></param>
+        /// <param name="recipientId"></param>
+        /// <returns></returns>
         public bool AddTransaction(int id, DateTime date, decimal montant, int senderId, int recipientId)
         {
             if (id <= 0) return false;
@@ -76,6 +100,9 @@ namespace Argent.Serie1
             transactions.Add(transac);
             return true;
         }
+        /// <summary>
+        /// affichage transac
+        /// </summary>
         public void afficheTransactios()
         {
             foreach (var transac in transactions)
@@ -83,7 +110,11 @@ namespace Argent.Serie1
                 Console.WriteLine(transac.idTransact + " " + transac.date + " " + transac.montant + " " + transac.recipientId + " " + transac.senderId);
             }
         }
-
+        /// <summary>
+        /// gestion des transaction 
+        /// </summary>
+        /// <param name="pathSortie">chemain du fichier de sortie</param>
+        /// <returns></returns>
         public List<string> TraiterTransactions(string pathSortie)
         {   //pour optimiser la recherche on crée un dictionnaire avec les listes key : id
             var compteById = accounts.ToDictionary(a => a.idCpt);
@@ -93,9 +124,9 @@ namespace Argent.Serie1
             var seen = new HashSet<int>();
             //fabrique la ligne pour le csv (a retiré pour le final)
              string Fmt(Transaction t, bool ok, string reason = "")
-                => $"{t.idTransact}:{(ok ? "OK" : "KO")};{t.date:dd/MM/yyyy HH:mm:ss};" +
-                   $"{t.montant};{t.senderId};{t.recipientId};{reason}";
-               // => $"{t.idTransact}:{(ok ? "OK" : "KO")};";
+                //=> $"{t.idTransact}:{(ok ? "OK" : "KO")};{t.date:dd/MM/yyyy HH:mm:ss};" +
+                //   $"{t.montant};{t.senderId};{t.recipientId};{reason}";
+                => $"{t.idTransact}:{(ok ? "OK" : "KO")};";
 
 
             foreach (var transaction in transactions.OrderBy(t => t.date))
@@ -144,7 +175,7 @@ namespace Argent.Serie1
                 }
                 else
                 {
-                    // 0004 - VIREMENT: Compte -> Compte (règles inter-cartes + solde + plafond 10j côté débiteur)
+                    // 0004 - VIREMENT: Compte -> Compte 
                     if (!compteById.TryGetValue(transaction.senderId, out var sAcc))
                         reason = "Expéditeur inexistant";
                     else if (!compteById.TryGetValue(transaction.recipientId, out var rAcc))
@@ -156,8 +187,8 @@ namespace Argent.Serie1
                     else
                     {
                         bool sameCard = sCard.idCarte == rCard.idCarte;
-                        if (!sameCard && !(sAcc.type == AccountType.Courant && rAcc.type == AccountType.Courant))
-                            reason = "Inter-cartes autorisé uniquement entre comptes Courants";
+                        if (!sameCard && !(sAcc.type == AccountType.Courant && rAcc.type == AccountType.Courant)) //si c'est la meme carte ok sinon doit étre courant -> courant
+                            reason = "Transaction autorisé uniquement entre comptes Courants";
                         else if (!sAcc.CanWithdraw(transaction.montant))
                             reason = "Solde insuffisant";
                         else if (!WindowFor(sCard.idCarte).CanDebit(transaction.date, transaction.montant, sCard.plafond))
@@ -180,15 +211,6 @@ namespace Argent.Serie1
             return results;
         }
 
-
-
-        private readonly struct Debit
-        {
-            public readonly DateTime When;
-            public readonly decimal Amount;
-            public Debit(DateTime when, decimal amount) { When = when; Amount = amount; }
-        }
-
         /// <summary>
         /// regarde avec l'id du compte si il existe, retourne le compte sinon null
         /// </summary>
@@ -205,7 +227,12 @@ namespace Argent.Serie1
         public Carte? GetCarteByNumero(long numero)
             => cards.Find(c => c.idCarte == numero);
 
+        /// <summary>
+        /// cherche la liste dans mon dictionnaire de carte debit si il ne le trouve pas en crée un nouveau.
+        /// </summary>
+        /// <param name="cardNum"></param>
+        /// <returns></returns>
         private DebitWindow WindowFor(long cardNum)
-    => _windows.TryGetValue(cardNum, out var w) ? w : (_windows[cardNum] = new DebitWindow());
+            => debit.TryGetValue(cardNum, out var w) ? w : (debit[cardNum] = new DebitWindow());
     }
 }

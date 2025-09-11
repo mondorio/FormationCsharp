@@ -15,33 +15,35 @@ namespace Argent.Serie1
         private static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
         private const string DateFormat = "dd/MM/yyyy HH:mm:ss";
         private static bool HeaderDone = false;
+
         /// <summary>
-        /// lecture des carte
+        /// récupére nos carte dans le fichier cartes
         /// </summary>
         /// <param name="path">chemain du fichier</param>
         /// <param name="bank"></param>
         /// <returns></returns>
         public static bool LoadCards(string path, Banque bank)
         {
-            if (!File.Exists(path)) return false;
+            if (!File.Exists(path)) return false; //verif que le fichier existe 
 
-            var seen = new HashSet<long>();
+            var seen = new HashSet<long>();       // liste d'id pour eviter les doublons 
             foreach (var line in File.ReadLines(path))
             {
                 int plafond = 500;
                 long numCpt = 0;
 
-                if (string.IsNullOrWhiteSpace(line)) continue;
+                if (string.IsNullOrWhiteSpace(line)) continue; //skip les lignes vide 
                 var parts = line.Split(';');
                 string num = parts[0].Trim();
                 if (parts.Length < 2) continue;
 
+                //recupére le plafond
                 if (!string.IsNullOrWhiteSpace(parts[1]) && parts[0].All(char.IsDigit))
                 {
                     if (!int.TryParse(parts[1].Trim(), out plafond))
                         continue;
                 }
-
+                // récupére l'id du compte
                 if (parts[0].Length == 16 && !string.IsNullOrWhiteSpace(parts[1]) && parts[0].All(char.IsDigit))
                 {
                     if (!long.TryParse(parts[0].Trim(), Inv, out numCpt))
@@ -50,7 +52,7 @@ namespace Argent.Serie1
                 else continue;
 
                 if (seen.Contains(numCpt)) continue;
-
+                plafond = (plafond / 100) * 100;
                 plafond = (plafond is >= 500 and <= 3000) ? plafond : 500;
 
                 if (bank.AddCard(numCpt, plafond)) seen.Add(numCpt);
@@ -58,6 +60,12 @@ namespace Argent.Serie1
             return true;
         }
 
+        /// <summary>
+        /// recupére les comptes sur notre fichier comtpes
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="bank"></param>
+        /// <returns></returns>
         public static bool LoadAccounts(string path, Banque bank)
         {
             if (!File.Exists(path)) return false;
@@ -65,14 +73,14 @@ namespace Argent.Serie1
             var seen = new HashSet<int>();
             foreach (var line in File.ReadLines(path))
             {
-                if (string.IsNullOrWhiteSpace(line)) continue;
+                if (string.IsNullOrWhiteSpace(line)) continue; //skip ligne vide
                 var parts = line.Split(';');
                 if (parts.Length < 3) continue;
 
-                if (!int.TryParse(parts[0].Trim(), out int id)) continue;
+                if (!int.TryParse(parts[0].Trim(), out int id)) continue; //skip id vide
                 long cardNumb = 0;
                 string typeStr = parts[2].Trim();
-
+                //check du type
                 AccountType type;
                 if (string.Equals(typeStr, "Courant", StringComparison.OrdinalIgnoreCase)) type = AccountType.Courant;
                 else if (string.Equals(typeStr, "Livret", StringComparison.OrdinalIgnoreCase)) type = AccountType.Livret;
@@ -85,11 +93,10 @@ namespace Argent.Serie1
                     if (!decimal.TryParse(parts[3].Trim(), out initial)) continue;
                     if (initial < 0) continue;
                 }
-
+                // recupe le numero de carte 
                 if (parts[1].Length == 16 && !string.IsNullOrWhiteSpace(parts[1]) && parts[1].All(char.IsDigit))
                 {
-                    if (!long.TryParse(parts[1].Trim(), Inv, out cardNumb))
-                        continue;
+                    if (!long.TryParse(parts[1].Trim(), Inv, out cardNumb)) continue;
                 }
                 else continue;
 
@@ -99,58 +106,63 @@ namespace Argent.Serie1
             return true;
         }
 
-
+        /// <summary>
+        /// récupére nos transaction sur le fichier transactions et fait un premier trie sur les lignes en KO 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="pathS"></param>
+        /// <param name="bank"></param>
+        /// <returns></returns>
         public static bool LoadTransaction(string path, string pathS, Banque bank)
         {
             if (!File.Exists(path)) return false;
 
             //a commenter pour le prog final
             string Fmt(string line, string reason = "")
-               => $"{line}:KO;{reason}";
-               //=> $"{line}:KO;";
+               //=> $"{line}:KO;{reason}";
+               => $"{line}:KO;";
 
             var seen = new HashSet<int>();
             foreach (var line in File.ReadLines(path))
             {
                 if (string.IsNullOrWhiteSpace(line))
-                {
+                {// skip la ligne vide
                     continue;
                 }
                 var parts = line.Split(';');
                 if (parts.Length < 5)
-                {
-                    WriteFile(Fmt(line, "information manquante"), pathS);
+                {// verifie qu'on a bien toute les info
+                    WriteFile(Fmt(parts[0].Trim(), "information manquante"), pathS);
                     continue;
                 }
 
                 if (!int.TryParse(parts[0].Trim(), out int id))
                 {
-                    WriteFile(Fmt(line, "mauvais id"), pathS);
+                    WriteFile(Fmt(parts[0].Trim(), "mauvais id"), pathS);
                     continue;
                 }
                
                 //06/09/2025 14:05:00
                 if (!DateTime.TryParseExact(parts[1].Trim(),"dd/MM/yyyy HH:mm:ss" , Inv, DateTimeStyles.None, out DateTime date))
                 {
-                    WriteFile(Fmt(line, "date erronée"), pathS);
+                    WriteFile(Fmt(parts[0].Trim(), "date erronée"), pathS);
                     continue;
                 }
                 if (!decimal.TryParse(parts[2].Trim(), Inv, out decimal montant))
                 {
-                    WriteFile(Fmt(line, "montant erronée"), pathS);
+                    WriteFile(Fmt(parts[0].Trim(), "montant erronée"), pathS);
                     continue;
                 }
                 if (!int.TryParse(parts[3].Trim(), out int idExpe))
                 {
-                    WriteFile(Fmt(line, "expediteur erronée"), pathS);
+                    WriteFile(Fmt(parts[0].Trim(), "expediteur erronée"), pathS);
                     continue;
                 }
                 if (!int.TryParse(parts[4].Trim(), out int idDest))
                 {
-                    WriteFile(Fmt(line, "destinataire erronée"), pathS);
+                    WriteFile(Fmt(parts[0].Trim(), "destinataire erronée"), pathS);
                     continue;
                 }
-
 
                 if (seen.Contains(id)) continue;
                 if (bank.AddTransaction(id, date, montant, idExpe, idDest))
@@ -159,13 +171,17 @@ namespace Argent.Serie1
                 }
                 else
                 {
-                    WriteFile(Fmt(line, "Compte non trouver"), pathS);
+                    WriteFile(Fmt(parts[0].Trim(), "Compte non trouver"), pathS);
                     continue;
                 }
             }
             return true;
         }
-
+        /// <summary>
+        /// ecrit sur le fichier de sortie
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="path"></param>
         public static void WriteFile(string line, string path)
         {
             if (!HeaderDone)

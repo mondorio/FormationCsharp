@@ -23,7 +23,9 @@ namespace Argent.Serie1
         }
         //verif que l'on peut bien retirer de l'argent
         public bool CanWithdraw(decimal amount) => amount > 0 && solde >= amount;
+        //ajoute d'argent
         public void Deposit(decimal amount) => solde += amount;
+        //retrait
         public void Withdraw(decimal amount) => solde -= amount;
 
 
