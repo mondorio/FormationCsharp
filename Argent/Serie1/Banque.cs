@@ -16,7 +16,7 @@ namespace Argent.Serie1
         private List<Carte> cards = new();   
         private List<Compte> accounts = new();
         private List<Transaction> transactions = new();
-        private Dictionary<long, DebitWindow> debit = new(); //liste de debit par numero de carte
+        //private Dictionary<long, DebitWindow> debit = new(); //liste de debit par numero de carte
 
         public Banque()
         {
@@ -164,12 +164,12 @@ namespace Argent.Serie1
                         reason = "Carte expéditeur introuvable";
                     else if (!send.CanWithdraw(transaction.montant))
                         reason = "Solde insuffisant";
-                    else if (!WindowFor(sCard.idCarte).CanDebit(transaction.date, transaction.montant, sCard.plafond))
+                    else if (!sCard.WindowFor().CanDebit(transaction.date, transaction.montant, sCard.plafond))
                         reason = "Plafond 10j dépassé";
                     else
                     {
                         send.Withdraw(transaction.montant);
-                        WindowFor(sCard.idCarte).Record(transaction.date, transaction.montant);
+                        sCard.WindowFor().Record(transaction.date, transaction.montant);
                         ok = true;
                     }
                 }
@@ -191,13 +191,13 @@ namespace Argent.Serie1
                             reason = "Transaction autorisé uniquement entre comptes Courants";
                         else if (!sAcc.CanWithdraw(transaction.montant))
                             reason = "Solde insuffisant";
-                        else if (!WindowFor(sCard.idCarte).CanDebit(transaction.date, transaction.montant, sCard.plafond))
+                        else if (!sCard.WindowFor().CanDebit(transaction.date, transaction.montant, sCard.plafond))
                             reason = "Plafond 10j dépassé";
                         else
                         {
                             sAcc.Withdraw(transaction.montant);
                             rAcc.Deposit(transaction.montant);
-                            WindowFor(sCard.idCarte).Record(transaction.date, transaction.montant);
+                            sCard.WindowFor().Record(transaction.date, transaction.montant);
                             ok = true;
                         }
                     }
@@ -227,12 +227,5 @@ namespace Argent.Serie1
         public Carte? GetCarteByNumero(long numero)
             => cards.Find(c => c.idCarte == numero);
 
-        /// <summary>
-        /// cherche la liste dans mon dictionnaire de carte debit si il ne le trouve pas en crée un nouveau.
-        /// </summary>
-        /// <param name="cardNum"></param>
-        /// <returns></returns>
-        private DebitWindow WindowFor(long cardNum)
-            => debit.TryGetValue(cardNum, out var w) ? w : (debit[cardNum] = new DebitWindow());
     }
 }

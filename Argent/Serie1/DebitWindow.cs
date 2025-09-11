@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Argent.Serie1
 {
-    sealed class DebitWindow
+    public sealed class DebitWindow
     {
         private static readonly TimeSpan Window = TimeSpan.FromDays(10);
         private readonly List<(DateTime date, decimal amount)> ops = new();
