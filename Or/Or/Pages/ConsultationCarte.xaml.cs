@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 using Or.Business;
@@ -11,8 +12,11 @@ namespace Or.Pages
     /// </summary>
     public partial class ConsultationCarte : PageFunction<long>
     {
+        long numCarte;
+
         public ConsultationCarte(long numCarte)
         {
+            this.numCarte = numCarte;
             InitializeComponent();
             Carte c = SqlRequests.InfosCarte(numCarte);
             
@@ -58,5 +62,23 @@ namespace Or.Pages
             listView.ItemsSource = SqlRequests.ListeComptesAssociesCarte(long.Parse(Numero.Text));
         }
 
+        private void GoExportXML(object sender, RoutedEventArgs e)
+        {
+            CodeResultat result = XmlIO.SerializeComptesTransactions(numCarte);
+            if (result == CodeResultat.Ok)
+                MessageBox.Show(ResultLabels.Label(result));
+            else
+                MessageBox.Show(ResultLabels.Label(result));
+
+        }
+
+        private void GoImportXML(object sender, RoutedEventArgs e)
+        {
+            CodeResultat result = XmlIO.DeSerialiserTransactions(InputPath.Text.Trim());
+            if (result == CodeResultat.Ok)
+                MessageBox.Show(ResultLabels.Label(result));
+            else
+                MessageBox.Show(ResultLabels.Label(result));
+        }
     }
 }

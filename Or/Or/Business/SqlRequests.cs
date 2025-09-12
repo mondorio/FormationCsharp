@@ -28,7 +28,7 @@ namespace Or.Business
         static readonly string queryInsertHistTransac = "INSERT INTO HISTTRANSACTION (IdtTransaction,NumCarte) VALUES (@IdtTrans,@Carte)";
 
         static readonly string queryUpdateCompte = "UPDATE COMPTE SET Solde=Solde-@Montant WHERE IdtCpt=@IdtCompte";
-
+        static readonly string queryTousLesComptes = @"SELECT Id, IdentifiantCarte, Solde, Type FROM Compte  ORDER BY Id;";
         /// <summary>
         /// Obtention des infos d'une carte
         /// </summary>
@@ -101,6 +101,45 @@ namespace Or.Business
             return idtTransac;
         }
 
+        public static List<Compte> ListeTousLesComptes()
+{
+    var comptes = new List<Compte>();
+    string connectionString = ConstructionConnexionString(fileDb);
+
+    using (var connection = new SqliteConnection(connectionString))
+    {
+        connection.Open();
+
+        using (var command = new SqliteCommand(queryTousLesComptes, connection))
+        using (var reader = command.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                int idt               = reader.GetInt32(0);
+                long carte            = reader.GetInt64(1);
+
+                // suivant la définition de ta colonne SQLite, GetDecimal marche,
+                // sinon on fait une conversion sûre :
+                decimal solde =
+                    reader.GetFieldType(2) == typeof(decimal)
+                    ? reader.GetDecimal(2)
+                    : Convert.ToDecimal(reader.GetValue(2), System.Globalization.CultureInfo.InvariantCulture);
+
+                string typeCompteStr  = reader.GetString(3);
+
+                // mapping string -> enum (tolérant sur la casse)
+                TypeCompte typeCompte = 
+                    Enum.TryParse<TypeCompte>(typeCompteStr, true, out var t) ? t
+                    : (typeCompteStr == "Courant" ? TypeCompte.Courant : TypeCompte.Livret);
+
+                var compte = new Compte(idt, carte, typeCompte, solde);
+                comptes.Add(compte);
+            }
+        }
+    }
+
+    return comptes;
+}
 
         /// <summary>
         /// Liste des comptes associés à une carte donnée

@@ -24,6 +24,12 @@ namespace Or.Business
         CompteIntrouvable,
         CarteIntrouvable,
 
+        // fichier
+        XMLExportFail,
+        XMLImportFail,
+        XMLNotFound,
+        XMLEmpty,
+
         ErreurInconnue
     }
 
@@ -42,6 +48,10 @@ namespace Or.Business
                 case CodeResultat.VirementVersLivretAutreCarteInterdit: return "Virement vers Livret d’une autre carte interdit.";
                 case CodeResultat.CompteIntrouvable: return "Compte introuvable.";
                 case CodeResultat.CarteIntrouvable: return "Carte introuvable.";
+                case CodeResultat.XMLExportFail: return "Le fichier XML n'a pas réussi à ce crée";
+                case CodeResultat.XMLImportFail: return "Le fichier XML n'a pas réussi être traiter";
+                case CodeResultat.XMLNotFound: return "fichier introuvable";
+                case CodeResultat.XMLEmpty: return "fichier vide";
                 default: return "Erreur inconnue.";
             };
         }

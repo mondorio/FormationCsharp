@@ -70,6 +70,8 @@
     <Compile Include="Business\SqlRequests.cs" />
     <Compile Include="Business\Tools.cs" />
     <Compile Include="Business\TypeConverter.cs" />
+    <Compile Include="Business\XmlIO - Copier.cs" />
+    <Compile Include="Business\XmlIO.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -149,6 +151,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Files\1234567890123456" />
+    <None Include="Files\4567891012345678" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -198,5 +202,6 @@
       <Version>4.5.2</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

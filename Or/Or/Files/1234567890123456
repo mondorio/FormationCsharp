@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfXMLCompte xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <XMLCompte Identifiant="3" Type="Courant" Solde="310,00 €">
+    <Transactions>
+      <Transaction Identifiant="26" Date="2025-09-12T01:19:26" Type="DepotSimple" CompteExpediteur="0" CompteDestinataire="3" Montant="10,00 €" />
+      <Transaction Identifiant="25" Date="2025-09-12T01:19:19" Type="RetraitSimple" CompteExpediteur="3" CompteDestinataire="0" Montant="6,00 €" />
+      <Transaction Identifiant="24" Date="2025-09-12T01:19:07" Type="InterCompte" CompteExpediteur="3" CompteDestinataire="4" Montant="33,00 €" />
+      <Transaction Identifiant="23" Date="2025-09-12T01:18:57" Type="InterCompte" CompteExpediteur="4" CompteDestinataire="3" Montant="11,00 €" />
+      <Transaction Identifiant="22" Date="2025-09-12T01:18:46" Type="InterCompte" CompteExpediteur="3" CompteDestinataire="1" Montant="22,00 €" />
+    </Transactions>
+  </XMLCompte>
+  <XMLCompte Identifiant="4" Type="Livret" Solde="882,00 €">
+    <Transactions>
+      <Transaction Identifiant="24" Date="2025-09-12T01:19:07" Type="InterCompte" CompteExpediteur="3" CompteDestinataire="4" Montant="33,00 €" />
+      <Transaction Identifiant="23" Date="2025-09-12T01:18:57" Type="InterCompte" CompteExpediteur="4" CompteDestinataire="3" Montant="11,00 €" />
+    </Transactions>
+  </XMLCompte>
+</ArrayOfXMLCompte>
