@@ -87,7 +87,7 @@
         <Button Content="Exporter transaction" Margin="470,388,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoExportXML" Width="180" Background="White"/>
 
         <TextBlock x:Name="Titre_path" HorizontalAlignment="Left" Margin="100,415,0,0" TextWrapping="Wrap" Text="Fichier à importer" VerticalAlignment="Top" FontSize="13" FontWeight="SemiBold"/>
-        <TextBlock x:Name="InputPath" HorizontalAlignment="Left" Margin="100,435,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="180" Background="#FFD2D0D0" Height="20" FontSize="14"/>
         <Button Content="Importer transaction" Margin="470,429,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoImportXML" Width="180" Background="White"/>
+        <TextBox x:Name="InputPath" HorizontalAlignment="Left" Margin="100,440,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Height="22"/>
     </Grid>
 </PageFunction>

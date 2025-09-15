@@ -19,7 +19,7 @@ namespace Or.Pages
             this.numCarte = numCarte;
             InitializeComponent();
             Carte c = SqlRequests.InfosCarte(numCarte);
-            
+
             Numero.Text = c.Id.ToString();
             Prenom.Text = c.PrenomClient;
             Nom.Text = c.NomClient;
@@ -74,7 +74,7 @@ namespace Or.Pages
 
         private void GoImportXML(object sender, RoutedEventArgs e)
         {
-            CodeResultat result = XmlIO.DeSerialiserTransactions(InputPath.Text.Trim());
+            CodeResultat result = XmlIO.DeSerialiserTransactions(InputPath.Text.Trim(), numCarte);
             if (result == CodeResultat.Ok)
                 MessageBox.Show(ResultLabels.Label(result));
             else

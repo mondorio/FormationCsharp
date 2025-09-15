@@ -82,10 +82,15 @@ namespace Or.Models
         /// <param name="montant"></param>
         /// <param name="dateEffet"></param>
         /// <returns></returns>
+        /// <summary>
+        /// Test d'éligibilité par rapport au plafond maximal de la carte
+        /// </summary>
+        /// <param name="montant"></param>
+        /// <param name="dateEffet"></param>
+        /// <returns></returns>
         private CodeResultat EstEligibleMaximumRetraitHebdomadaire(decimal montant, DateTime dateEffet)
         {
-            List<Transaction> retraitsHisto =
-                Historique.Where(x => x.Expediteur == Id && x.Horodatage > dateEffet.AddDays(-10)).Select(x => x).ToList();
+            List<Transaction> retraitsHisto = Historique.Where(x => (x.Horodatage > dateEffet.AddDays(-10)) && ListComptesId.Contains(x.Expediteur)).Select(x => x).ToList();
             decimal sommeHisto = montant + retraitsHisto.Sum(x => x.Montant);
             if (sommeHisto < Plafond)
             {

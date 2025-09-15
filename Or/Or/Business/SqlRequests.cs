@@ -28,7 +28,7 @@ namespace Or.Business
         static readonly string queryInsertHistTransac = "INSERT INTO HISTTRANSACTION (IdtTransaction,NumCarte) VALUES (@IdtTrans,@Carte)";
 
         static readonly string queryUpdateCompte = "UPDATE COMPTE SET Solde=Solde-@Montant WHERE IdtCpt=@IdtCompte";
-        static readonly string queryTousLesComptes = @"SELECT Id, IdentifiantCarte, Solde, Type FROM Compte  ORDER BY Id;";
+        static readonly string queryTousLesComptes = @"SELECT IdtCpt, NumCarte, Solde, TypeCompte FROM Compte  ORDER BY IdtCpt;";
         /// <summary>
         /// Obtention des infos d'une carte
         /// </summary>
@@ -331,7 +331,7 @@ namespace Or.Business
 
             Operation typeOpe = Tools.TypeTransaction(trans.Expediteur, trans.Destinataire);
 
-            if (typeOpe != Operation.DepotSimple && typeOpe != Operation.RetraitSimple)
+            if (typeOpe != Operation.DepotSimple && typeOpe != Operation.RetraitSimple && typeOpe != Operation.InterCompte)
             {
                 return false;
             }

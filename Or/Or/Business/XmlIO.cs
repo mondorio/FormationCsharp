@@ -161,107 +161,117 @@ namespace Or.Business
             return elem?.Value?.Trim();
         }
 
-        public static CodeResultat DeSerialiserTransactions(string path)
+        public static CodeResultat DeSerialiserTransactions(string path, long numCarte)
         {
             var listTransaction = new List<Transaction>();
-            List<XMLTransaction> xMLtransactions;
             if (!File.Exists(path)) return CodeResultat.XMLNotFound;
 
-            // Conserver infos de lignes
+            var fr = CultureInfo.GetCultureInfo("fr-FR");
+
+            // charge en gardant les infos de ligne
             var xdoc = XDocument.Load(path, LoadOptions.SetLineInfo);
-            // var compte
+
+            // tous les comptes, peu importe les namespaces
             var cxNodes = xdoc
                 .Descendants()
                 .Where(e => e.Name.LocalName.Equals("XMLCompte", StringComparison.OrdinalIgnoreCase));
-
-            var results = new List<Transaction>();
-            var errors = new List<string>();
 
             foreach (var node in cxNodes)
             {
                 var ligne = (IXmlLineInfo)node;
 
-                //string idStr = GetAttrOrElem(node, "ExportCompte"); 
-                string idStr = node.Elements().FirstOrDefault(e => string.Equals(e.Name.LocalName, "Identifiant", StringComparison.OrdinalIgnoreCase)).Value;
-                if (idStr != null && !int.TryParse(idStr, out int id)) continue;
+                // --- ATTRIBUTS DU COMPTE ---
+                string idStr = (string)node.Attribute("Identifiant");
+                string typeStr = (string)node.Attribute("Type");
+                string soldeStr = (string)node.Attribute("Solde");
 
-                string typeStr = node.Elements().FirstOrDefault(e => string.Equals(e.Name.LocalName, "Type", StringComparison.OrdinalIgnoreCase)).Value;
-                if (typeStr != null && !TypeCompte.TryParse(typeStr, out TypeCompte type)) continue;
+                // id compte (optionnel: si absent on ignore le compte)
+                if (idStr != null && !int.TryParse(idStr, out int _))
+                    continue;
 
-                string soldeStr = node.Elements().FirstOrDefault(e => string.Equals(e.Name.LocalName, "Solde", StringComparison.OrdinalIgnoreCase)).Value.Trim('€', ' ');
-                if (soldeStr != null && !decimal.TryParse(idStr, out decimal solde)) continue;
+                // type de compte
+                if (typeStr != null && !TypeCompte.TryParse(typeStr, out TypeCompte _))
+                    continue;
 
-                // attrape tous les nœuds "Transaction", peu importe les namespaces
+                // solde (ex: "10 732,00 €" avec espace insécable)
+                if (soldeStr != null)
+                {
+                    var cleanedSolde = soldeStr.Replace("€", "").Trim();
+                    // remplace l’insécable par un espace normal
+                    cleanedSolde = cleanedSolde.Replace('\u00A0', ' ');
+                    if (!decimal.TryParse(cleanedSolde, NumberStyles.Number, fr, out decimal _))
+                        continue;
+                }
+
+                // --- TRANSACTIONS ---
                 var txNodes = node
                     .Descendants()
                     .Where(e => e.Name.LocalName.Equals("Transaction", StringComparison.OrdinalIgnoreCase));
 
                 foreach (var tx in txNodes)
-                { // Identifiant="26" Date="2025-09-12T01:19:26" Type="DepotSimple" CompteExpediteur="0" CompteDestinataire="3" Montant="10,00 €" />
-                    int idt = 0; DateTime dateT = DateTime.Now; Operation typeT = Operation.InterCompte; 
-                    int CompteExpediteurT = 0; int CompteDestinataireT = 0 ; decimal MontantT = 0;
+                {
+                    // Valeurs par défaut
+                    int idt = 0;
+                    DateTime dateT = DateTime.Now;
+                    Operation typeT = Operation.InterCompte;
+                    int compteExp = 0;
+                    int compteDest = 0;
+                    decimal montant = 0m;
 
-                    string idTStr = tx.Elements().FirstOrDefault(e => string.Equals(e.Name.LocalName, "Identifiant", StringComparison.OrdinalIgnoreCase)).Value;
-                    if (idStr != null && !int.TryParse(idStr, out  idt)) continue;
+                    // tous en ATTRIBUTS
+                    string idTStr = (string)tx.Attribute("Identifiant");
+                    string dateTStr = (string)tx.Attribute("Date");                 // ex: 2025-09-12T01:18:49
+                    string typeTStr = (string)tx.Attribute("Type");
+                    string expStr = (string)tx.Attribute("CompteExpediteur");
+                    string destStr = (string)tx.Attribute("CompteDestinataire");
+                    string montantStr = (string)tx.Attribute("Montant");              // ex: "22,00 €"
 
-                    string dateTStr = tx.Elements().FirstOrDefault(e => string.Equals(e.Name.LocalName, "Date", StringComparison.OrdinalIgnoreCase)).Value;
-                    if (dateTStr != null && !DateTime.TryParseExact(dateTStr, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture ,DateTimeStyles.None, out  dateT)) continue;
+                    // id transaction
+                    if (idTStr != null && !int.TryParse(idTStr, out idt))
+                        continue;
 
-                    string typeTStr = tx.Elements().FirstOrDefault(e => string.Equals(e.Name.LocalName, "Type", StringComparison.OrdinalIgnoreCase)).Value;
-                    if (typeTStr != null && !Operation.TryParse(typeTStr, out  typeT)) continue;
+                    // date ISO
+                    if (dateTStr != null &&
+                        !DateTime.TryParseExact(dateTStr, "yyyy-MM-dd'T'HH:mm:ss", CultureInfo.InvariantCulture,
+                                                DateTimeStyles.None, out dateT))
+                        continue;
 
-                    string CompteExpediteurStr = tx.Elements().FirstOrDefault(e => string.Equals(e.Name.LocalName, "CompteExpediteur", StringComparison.OrdinalIgnoreCase)).Value;
-                    if (CompteExpediteurStr != null) CompteExpediteurT = 0;
-                    else
+                    // type opération
+                    if (typeTStr != null && !Operation.TryParse(typeTStr, out typeT))
+                        continue;
+
+                    // expéditeur : si attribut absent ou "0" => 0
+                    if (!string.IsNullOrEmpty(expStr) && expStr != "0")
                     {
-                        if (!int.TryParse(CompteExpediteurStr, out CompteExpediteurT)) continue;
+                        if (!int.TryParse(expStr, out compteExp))
+                            continue;
                     }
 
-
-                    string CompteDestinataireStr = tx.Elements().FirstOrDefault(e => string.Equals(e.Name.LocalName, "CompteDestinataire", StringComparison.OrdinalIgnoreCase)).Value;
-                    if (CompteDestinataireStr != null) CompteDestinataireT = 0;
-                    else
+                    // destinataire : si attribut absent ou "0" => 0
+                    if (!string.IsNullOrEmpty(destStr) && destStr != "0")
                     {
-                        if (!int.TryParse(CompteDestinataireStr, out CompteDestinataireT)) continue;
+                        if (!int.TryParse(destStr, out compteDest))
+                            continue;
                     }
 
-                    string MontantStr = tx.Elements().FirstOrDefault(e => string.Equals(e.Name.LocalName, "Montant", StringComparison.OrdinalIgnoreCase)).Value.Trim('€', ' ');
-                    if (MontantStr != null && !decimal.TryParse(MontantStr, out  MontantT)) continue;
+                    // montant
+                    if (!string.IsNullOrWhiteSpace(montantStr))
+                    {
+                        var cleaned = montantStr.Replace("€", "").Trim().Replace('\u00A0', ' ');
+                        if (!decimal.TryParse(cleaned, NumberStyles.Number, fr, out montant))
+                            continue;
+                    }
 
-                     
-                    listTransaction.Add(new Transaction(idt, dateT, typeT, MontantT, CompteExpediteurT, CompteDestinataireT));
+                    listTransaction.Add(new Transaction(idt, dateT, typeT, montant, compteExp, compteDest));
                 }
             }
 
-            //validation 
-            /*var settings = new XmlReaderSettings();
-            settings.ValidationType = ValidationType.Schema;
-            settings.Schemas.Add(null, "modele.xsd"); // ton XSD*/
-
-            //deserialise
-            /*var serializer = new XmlSerializer(typeof(List<XMLTransaction>));
-            using (var reader = new StreamReader(path))
-            {
-                xMLtransactions = (List<XMLTransaction>)serializer.Deserialize(reader);
-            }
-
-            if(xMLtransactions.Count == 0) return CodeResultat.XMLEmpty;
-
-            
-            
-            foreach (XMLTransaction xml in xMLtransactions)
-            {
-                if (decimal.TryParse(xml.Montant, out decimal mont)) continue;
-
-                Transaction t = new Transaction(xml.Id,xml.Date,mont, xml.CompteExpediteur, xml.CompteDestinataire);
-                listTransaction.Add(t);
-            }*/
-
-            if (!TraitementTransactionsImportees(listTransaction)) return CodeResultat.XMLImportFail;
+            if (!TraitementTransactionsImportees(listTransaction, numCarte))
+                return CodeResultat.XMLImportFail;
 
             return CodeResultat.Ok;
         }
-            public static bool TraitementTransactionsImportees(List<Transaction> transactions)
+        public static bool TraitementTransactionsImportees(List<Transaction> transactions, long numCarte)
         {
             if (transactions == null || transactions.Count == 0) return false;
 
@@ -308,7 +318,7 @@ namespace Or.Business
                     nbIntegrees++;
 
                     // crée la conection 
-                    //SqlRequests.ConstructionInsertionTransaction( , t);
+                    SqlRequests.EffectuerModificationOperationSimple(t, numCarte);
                 }
                 catch
                 {
