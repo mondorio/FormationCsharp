@@ -1,0 +1,23 @@
+﻿<PageFunction 
+    x:Class="Or.Pages.AjoutBenéficiaire"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+xmlns:sys="clr-namespace:System;assembly=mscorlib"
+x:TypeArguments="sys:Int64"
+xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+xmlns:local="clr-namespace:Or.Pages"
+xmlns:ec="clr-namespace:Or.Business"
+mc:Ignorable="d" d:DesignWidth="800"
+Title="ConsultationCarte" KeepAlive="True" Height="538">
+
+    <Grid>
+        <TextBlock x:Name="Titre" HorizontalAlignment="Left" Margin="100,85,0,0" TextWrapping="Wrap" Text="Ajouter un Beneficiaire" VerticalAlignment="Top" FontSize="20" FontWeight="SemiBold"/>
+        <TextBlock x:Name="Titre2" HorizontalAlignment="Left" Margin="99,218,0,0" TextWrapping="Wrap" Text="n° de compte de beneficiaire" VerticalAlignment="Top" FontSize="13" FontWeight="SemiBold"/>
+        <TextBox x:Name="InputCPT" HorizontalAlignment="Left" Margin="99,243,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Height="22"/>
+
+        <Button Content="Ajouter" Margin="465,237,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Ajouter_click" Width="180" Background="White"/>
+        <Button Content="Retour" Margin="68,335,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Retour_Click" Width="180" Background="White"/>
+
+    </Grid>
+</PageFunction>

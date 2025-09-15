@@ -80,11 +80,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\AjoutBenéficiaire.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\ConsultationCarte.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\Depot.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\DetailsBeneficiaires.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -110,17 +118,24 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\Beneficiaire.cs" />
     <Compile Include="Models\Compte.cs" />
     <Compile Include="Models\Transaction.cs" />
     <Compile Include="Pages\Accueil.xaml.cs">
       <DependentUpon>Accueil.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\Carte.cs" />
+    <Compile Include="Pages\AjoutBenéficiaire.xaml.cs">
+      <DependentUpon>AjoutBenéficiaire.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\ConsultationCarte.xaml.cs">
       <DependentUpon>ConsultationCarte.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\Depot.xaml.cs">
       <DependentUpon>Depot.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\DetailsBeneficiaires.xaml.cs">
+      <DependentUpon>DetailsBeneficiaires.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\DetailsCompte.xaml.cs">
       <DependentUpon>DetailsCompte.xaml</DependentUpon>

@@ -7,11 +7,10 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Or.Pages"
       xmlns:ec="clr-namespace:Or.Business"
-      mc:Ignorable="d" 
-      d:DesignHeight="470" d:DesignWidth="800"
-      Title="ConsultationCarte" KeepAlive="True">
+      mc:Ignorable="d" d:DesignWidth="800"
+      Title="ConsultationCarte" KeepAlive="True" Height="538">
 
-    <Grid Margin="0,0,0,-26">
+    <Grid Margin="0,0,0,-90">
         <TextBlock x:Name="Titre" HorizontalAlignment="Left" Margin="100,85,0,0" TextWrapping="Wrap" Text="Consultation Carte" VerticalAlignment="Top" FontSize="20" FontWeight="SemiBold"/>
 
         <TextBlock x:Name="Numero" HorizontalAlignment="Left" Margin="100,145,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="180" Background="#FFD2D0D0" Height="20" FontSize="14"/>
@@ -86,8 +85,9 @@
         <Button Content="Effectuer un Virement" Margin="100,380,0,20" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoVirement" Width="180"/>
         <Button Content="Exporter transaction" Margin="470,388,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoExportXML" Width="180" Background="White"/>
 
-        <TextBlock x:Name="Titre_path" HorizontalAlignment="Left" Margin="100,415,0,0" TextWrapping="Wrap" Text="Fichier à importer" VerticalAlignment="Top" FontSize="13" FontWeight="SemiBold"/>
+        <TextBlock x:Name="Titre_path" HorizontalAlignment="Left" Margin="102,475,0,0" TextWrapping="Wrap" Text="Fichier à importer" VerticalAlignment="Top" FontSize="13" FontWeight="SemiBold"/>
         <Button Content="Importer transaction" Margin="470,429,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoImportXML" Width="180" Background="White"/>
-        <TextBox x:Name="InputPath" HorizontalAlignment="Left" Margin="100,440,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Height="22"/>
+        <TextBox x:Name="InputPath" HorizontalAlignment="Left" Margin="102,500,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Height="22"/>
+        <Button Content="Liste Beneficiaires" Margin="100,422,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoBeneficiaire" Width="180" Background="#FFF7F7F7"/>
     </Grid>
 </PageFunction>

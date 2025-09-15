@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -10,9 +11,10 @@ namespace Or.Pages
     /// <summary>
     /// Logique ht'interaction pour ConsultationCarte.xaml
     /// </summary>
-    public partial class ConsultationCarte : PageFunction<long>
+    public partial class ConsultationCarte : PageFunction<Int64>
     {
         long numCarte;
+        List<Compte> comptes;
 
         public ConsultationCarte(long numCarte)
         {
@@ -24,7 +26,8 @@ namespace Or.Pages
             Prenom.Text = c.PrenomClient;
             Nom.Text = c.NomClient;
 
-            listView.ItemsSource = SqlRequests.ListeComptesAssociesCarte(numCarte);
+            comptes = SqlRequests.ListeComptesAssociesCarte(numCarte);
+            listView.ItemsSource = comptes;
         }
         private void GoDetailsCompte(object sender, RoutedEventArgs e)
         {
@@ -79,6 +82,11 @@ namespace Or.Pages
                 MessageBox.Show(ResultLabels.Label(result));
             else
                 MessageBox.Show(ResultLabels.Label(result));
+        }
+
+        private void GoBeneficiaire(object sender, RoutedEventArgs e)
+        {
+            PageFunctionNavigate(new DetailsBeneficiaires(long.Parse(Numero.Text), comptes[0]));
         }
     }
 }

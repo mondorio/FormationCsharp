@@ -29,6 +29,14 @@ namespace Or.Business
 
         static readonly string queryUpdateCompte = "UPDATE COMPTE SET Solde=Solde-@Montant WHERE IdtCpt=@IdtCompte";
         static readonly string queryTousLesComptes = @"SELECT IdtCpt, NumCarte, Solde, TypeCompte FROM Compte";
+
+        private const string queryBeneficiairesParCarteTitulaire = @"SELECT b.IdtCpt, cpt.NumCarte AS NumCarteBenef, crt.NomClient, crt.PrenomClient, cpt.Solde, cpt.TypeCompte FROM BENEFICIAIRE b JOIN COMPTE cpt ON cpt.IdtCpt = b.IdtCpt JOIN CARTE  crt ON crt.NumCarte = cpt.NumCarte WHERE b.NumCarte = @NumCarte ORDER BY crt.NomClient, crt.PrenomClient, b.IdtCpt;";                 
+        private const string queryAjoutBenef = @"INSERT INTO BENEFICIAIRE (NumCarte, IdtCpt) VALUES (@NumCarte, @IdtCpt);";
+        private const string querySupprBenef = @"DELETE FROM BENEFICIAIRE WHERE NumCarte = @NumCarte AND IdtCpt = @IdtCpt;";
+      private const string queryCompteExisteEtElig = @"SELECT CASE WHEN EXISTS ( SELECT 1 FROM COMPTE c JOIN CARTE ca ON ca.NumCarte = c.NumCarte  WHERE c.IdtCpt = @IdtCpt) THEN 1 ELSE 0 END;";
+
+        private const string queryExisteBenef = @" SELECT EXISTS( SELECT 1 FROM BENEFICIAIRE WHERE NumCarte = @NumCarte AND IdtCpt = @IdtCpt );";
+
         /// <summary>
         /// Obtention des infos d'une carte
         /// </summary>
@@ -510,5 +518,105 @@ namespace Or.Business
             return updateCompte;
         }
 
+        public static List<BeneficiaireRow> ListeBeneficiairesPourCarte(long numCarte)
+        {
+            var rows = new List<BeneficiaireRow>();
+            var cnx = new SqliteConnection(ConstructionConnexionString(fileDb));
+            cnx.Open();
+
+            var cmd = new SqliteCommand(queryBeneficiairesParCarteTitulaire, cnx);
+            cmd.Parameters.AddWithValue("@NumCarte", numCarte);
+
+            var rd = cmd.ExecuteReader();
+            while (rd.Read())
+            {
+                var idtCpt = rd.GetInt32(0);
+                var numBenef = rd.GetInt64(1);
+                var nom = rd.GetString(2);
+                var prenom = rd.GetString(3);
+                var solde = Convert.ToDecimal(rd.GetValue(4), System.Globalization.CultureInfo.InvariantCulture);
+                var type = rd.GetString(5);
+
+                rows.Add(new BeneficiaireRow
+                {
+                    Id = idtCpt,    
+                    Nom = nom,
+                    Prenom = prenom,
+                    NumeroCompte = idtCpt,
+                });
+            }
+            return rows;
+        }
+        /*public static List<Carte> ListeCartesAssocieesClient(long numCarte)
+        {
+            var cartes = new List<Carte>();
+            var cnx = new SqliteConnection(ConstructionConnexionString(fileDb));
+            cnx.Open();
+
+            var cmd = new SqliteCommand(queryListeBenef, cnx);
+            cmd.Parameters.AddWithValue("@NumCarte", numCarte);
+
+            var rd = cmd.ExecuteReader();
+            while (rd.Read())
+            { 
+                long num = rd.GetInt64(0);
+                string nom = rd.GetString(1);
+                string prenom = rd.GetString(2);
+
+                cartes.Add(new Carte( num,nom,prenom ));
+
+            }
+            return cartes;
+        }*/
+
+        public static bool EstBeneficiairePotentiel(long numCarte, int idtCpt)
+        {
+            var cnx = new SqliteConnection(ConstructionConnexionString(fileDb));
+            cnx.Open();
+
+            // Le compte existe et est lié à une carte
+            using (var cmd = new SqliteCommand(queryCompteExisteEtElig, cnx))
+            {
+                cmd.Parameters.AddWithValue("@IdtCpt", idtCpt);
+                var exists = Convert.ToInt32(cmd.ExecuteScalar());
+                if (exists != 1) return false;
+            }
+
+            // Pas déjà bénéficiaire pour cette carte
+            using (var cmd = new SqliteCommand(queryExisteBenef, cnx))
+            {
+                cmd.Parameters.AddWithValue("@NumCarte", numCarte);
+                cmd.Parameters.AddWithValue("@IdtCpt", idtCpt);
+                var already = Convert.ToInt32(cmd.ExecuteScalar());
+                if (already == 1) return false;
+            }
+
+            return true;
+        }
+
+        public static void AjoutBeneficiaire(long numCarte, int idtCpt)
+        {
+            var cnx = new SqliteConnection(ConstructionConnexionString(fileDb));
+            cnx.Open();
+
+            if (!EstBeneficiairePotentiel(numCarte, idtCpt))
+                throw new InvalidOperationException("Saisie bénéficiaire invalide.");
+
+            var cmd = new SqliteCommand(queryAjoutBenef, cnx);
+            cmd.Parameters.AddWithValue("@NumCarte", numCarte);
+            cmd.Parameters.AddWithValue("@IdtCpt", idtCpt);
+            cmd.ExecuteNonQuery();
+        }
+
+        public static void SuppressionBeneficiaire(long numCarte, int idtCpt)
+        {
+            var cnx = new SqliteConnection(ConstructionConnexionString(fileDb));
+            cnx.Open();
+
+            var cmd = new SqliteCommand(querySupprBenef, cnx);
+            cmd.Parameters.AddWithValue("@NumCarte", numCarte);
+            cmd.Parameters.AddWithValue("@IdtCpt", idtCpt);
+            cmd.ExecuteNonQuery();
+        }
     }
 }
