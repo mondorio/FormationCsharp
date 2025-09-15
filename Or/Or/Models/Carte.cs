@@ -168,6 +168,6 @@ namespace Or.Models
             }
             else return CodeResultat.VirementVersLivretAutreCarteInterdit;
         }
-
+        
     }
 }

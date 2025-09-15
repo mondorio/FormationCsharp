@@ -28,7 +28,7 @@ namespace Or.Business
         static readonly string queryInsertHistTransac = "INSERT INTO HISTTRANSACTION (IdtTransaction,NumCarte) VALUES (@IdtTrans,@Carte)";
 
         static readonly string queryUpdateCompte = "UPDATE COMPTE SET Solde=Solde-@Montant WHERE IdtCpt=@IdtCompte";
-        static readonly string queryTousLesComptes = @"SELECT IdtCpt, NumCarte, Solde, TypeCompte FROM Compte  ORDER BY IdtCpt;";
+        static readonly string queryTousLesComptes = @"SELECT IdtCpt, NumCarte, Solde, TypeCompte FROM Compte";
         /// <summary>
         /// Obtention des infos d'une carte
         /// </summary>
@@ -101,45 +101,47 @@ namespace Or.Business
             return idtTransac;
         }
 
-        public static List<Compte> ListeTousLesComptes()
-{
-    var comptes = new List<Compte>();
-    string connectionString = ConstructionConnexionString(fileDb);
-
-    using (var connection = new SqliteConnection(connectionString))
-    {
-        connection.Open();
-
-        using (var command = new SqliteCommand(queryTousLesComptes, connection))
-        using (var reader = command.ExecuteReader())
+        public static List<Compte> ListeTousLesComptesCarte()
         {
-            while (reader.Read())
+            var comptes = new List<Compte>();
+            string connectionString = ConstructionConnexionString(fileDb);
+
+            using (var connection = new SqliteConnection(connectionString))
             {
-                int idt               = reader.GetInt32(0);
-                long carte            = reader.GetInt64(1);
+                connection.Open();
 
-                // suivant la définition de ta colonne SQLite, GetDecimal marche,
-                // sinon on fait une conversion sûre :
-                decimal solde =
-                    reader.GetFieldType(2) == typeof(decimal)
-                    ? reader.GetDecimal(2)
-                    : Convert.ToDecimal(reader.GetValue(2), System.Globalization.CultureInfo.InvariantCulture);
+                using (var command = new SqliteCommand(queryTousLesComptes, connection))
+                {
 
-                string typeCompteStr  = reader.GetString(3);
+                   // command.Parameters.AddWithValue("@NumCarte", NumCarte);
 
-                // mapping string -> enum (tolérant sur la casse)
-                TypeCompte typeCompte = 
-                    Enum.TryParse<TypeCompte>(typeCompteStr, true, out var t) ? t
-                    : (typeCompteStr == "Courant" ? TypeCompte.Courant : TypeCompte.Livret);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int idt = reader.GetInt32(0);
+                            long carte = reader.GetInt64(1);
 
-                var compte = new Compte(idt, carte, typeCompte, solde);
-                comptes.Add(compte);
+                            decimal solde =
+                                reader.GetFieldType(2) == typeof(decimal)
+                                ? reader.GetDecimal(2)
+                                : Convert.ToDecimal(reader.GetValue(2), System.Globalization.CultureInfo.InvariantCulture);
+
+                            string typeCompteStr = reader.GetString(3);
+
+                            TypeCompte typeCompte =
+                                Enum.TryParse<TypeCompte>(typeCompteStr, true, out var t) ? t
+                                : (typeCompteStr == "Courant" ? TypeCompte.Courant : TypeCompte.Livret);
+
+                            var compte = new Compte(idt, carte, typeCompte, solde);
+                            comptes.Add(compte);
+                        }
+                    }
+                }
             }
-        }
-    }
 
-    return comptes;
-}
+            return comptes;
+        }
 
         /// <summary>
         /// Liste des comptes associés à une carte donnée
@@ -331,7 +333,7 @@ namespace Or.Business
 
             Operation typeOpe = Tools.TypeTransaction(trans.Expediteur, trans.Destinataire);
 
-            if (typeOpe != Operation.DepotSimple && typeOpe != Operation.RetraitSimple && typeOpe != Operation.InterCompte)
+            if (typeOpe != Operation.DepotSimple && typeOpe != Operation.RetraitSimple )
             {
                 return false;
             }
@@ -412,12 +414,12 @@ namespace Or.Business
                         // Insertion de la transaction
                         var insertTransac = ConstructionInsertionTransaction(connection, trans);
                         insertTransac.Transaction = transaction;
-                        insertTransac.ExecuteNonQuery();
+                        Console.Write(insertTransac.ExecuteNonQuery());
 
                         // Insertion de l'historique de transaction
                         var insertHistTransac = ConstructionInsertionHistTransaction(connection, idtTrans, numCarteExp);
                         insertHistTransac.Transaction = transaction;
-                        insertHistTransac.ExecuteNonQuery();
+                        Console.Write(insertHistTransac.ExecuteNonQuery());
 
                         if (numCarteDest != numCarteExp)
                         {
@@ -474,7 +476,7 @@ namespace Or.Business
             insertTransac.Parameters.AddWithValue("@Montant", trans.Montant);
             insertTransac.Parameters.AddWithValue("@CptExp", trans.Expediteur);
             insertTransac.Parameters.AddWithValue("@CptDest", trans.Destinataire);
-            
+
             return insertTransac;
         }
 
