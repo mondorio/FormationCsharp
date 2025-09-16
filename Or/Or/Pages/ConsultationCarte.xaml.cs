@@ -18,17 +18,28 @@ namespace Or.Pages
 
         public ConsultationCarte(long numCarte)
         {
-            this.numCarte = numCarte;
-            InitializeComponent();
-            Carte c = SqlRequests.InfosCarte(numCarte);
+            try
+            {
+                this.numCarte = numCarte;
+                InitializeComponent();
+                Carte c = SqlRequests.InfosCarte(numCarte);
+                
+                Numero.Text = c.Id.ToString();
+                Prenom.Text = c.PrenomClient;
+                Nom.Text = c.NomClient;
 
-            Numero.Text = c.Id.ToString();
-            Prenom.Text = c.PrenomClient;
-            Nom.Text = c.NomClient;
+                comptes = SqlRequests.ListeComptesAssociesCarte(numCarte);
+                listView.ItemsSource = comptes;
+                
 
-            comptes = SqlRequests.ListeComptesAssociesCarte(numCarte);
-            listView.ItemsSource = comptes;
+            }
+            catch
+            {
+                MessageBox.Show("Mauvais numero de carte");
+                NavigationService?.GoBack(); //marche pas je sais pas pourquoi
+            }
         }
+        
         private void GoDetailsCompte(object sender, RoutedEventArgs e)
         {
             PageFunctionNavigate(new DetailsCompte(long.Parse(Numero.Text), (int)(sender as Button).CommandParameter));

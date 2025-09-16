@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Or.Business;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 
@@ -16,8 +17,11 @@ namespace Or.Pages
 
         public void GoConsultationCarte(object sender, RoutedEventArgs e)
         {
-            long.TryParse(NumeroCarte.Text, out long result);
-            NavigationService.Navigate(new ConsultationCarte(result));
+            if(long.TryParse(NumeroCarte.Text, out long result))
+            {
+                NavigationService.Navigate(new ConsultationCarte(result));
+            }else MessageBox.Show("rentre un numero");
+
         }
     }
 }

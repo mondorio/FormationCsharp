@@ -83,11 +83,11 @@
         <Button Content="Effectuer un Retrait" Margin="100,300,0,20" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoRetrait" Width="180"/>
         <Button Content="Effectuer un Dépôt" Margin="100,340,0,20" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoDepot" Width="180"/>
         <Button Content="Effectuer un Virement" Margin="100,380,0,20" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoVirement" Width="180"/>
-        <Button Content="Exporter transaction" Margin="470,388,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoExportXML" Width="180" Background="White"/>
+        <Button Content="Exporter transaction" Margin="470,388,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoExportXML" Width="180" Background="#FFDDDDDD"/>
 
         <TextBlock x:Name="Titre_path" HorizontalAlignment="Left" Margin="102,475,0,0" TextWrapping="Wrap" Text="Fichier à importer" VerticalAlignment="Top" FontSize="13" FontWeight="SemiBold"/>
-        <Button Content="Importer transaction" Margin="470,429,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoImportXML" Width="180" Background="White"/>
-        <TextBox x:Name="InputPath" HorizontalAlignment="Left" Margin="102,500,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Height="22"/>
-        <Button Content="Liste Beneficiaires" Margin="100,422,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoBeneficiaire" Width="180" Background="#FFF7F7F7"/>
+        <Button Content="Importer transaction" Margin="470,429,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoImportXML" Width="180" Background="#FFDDDDDD"/>
+        <TextBox x:Name="InputPath" HorizontalAlignment="Left" Margin="102,500,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="178" Height="22"/>
+        <Button Content="Liste Beneficiaires" Margin="100,422,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="GoBeneficiaire" Width="180" Background="#FFDDDDDD"/>
     </Grid>
 </PageFunction>

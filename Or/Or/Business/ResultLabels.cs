@@ -19,6 +19,7 @@ namespace Or.Business
         SoldeInsuffisant,
         MemeCompteInterdit,
         VirementVersLivretAutreCarteInterdit,
+        BenefAlreadyOrDontExist,
 
         // Techniques
         CompteIntrouvable,
@@ -52,6 +53,7 @@ namespace Or.Business
                 case CodeResultat.XMLImportFail: return "Le fichier XML n'a pas réussi être traiter";
                 case CodeResultat.XMLNotFound: return "fichier introuvable";
                 case CodeResultat.XMLEmpty: return "fichier vide";
+                case CodeResultat.BenefAlreadyOrDontExist: return "Saisie bénéficiaire invalide";
                 default: return "Erreur inconnue.";
             };
         }

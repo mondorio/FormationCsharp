@@ -38,11 +38,17 @@ namespace Or.Pages
         {
             if (int.TryParse(InputCPT.Text.Trim(), out int cpt))
             {
-                SqlRequests.AjoutBeneficiaire(NumCarte, cpt);
-                MessageBox.Show(ResultLabels.Label(CodeResultat.Ok));
-                OnReturn(null);
+                CodeResultat result = SqlRequests.AjoutBeneficiaire(NumCarte, cpt);
+                if (result  == CodeResultat.Ok)
+                {
+                    MessageBox.Show(ResultLabels.Label(result));
+                    OnReturn(null);
+                }
+                else
+                {
+                    MessageBox.Show(ResultLabels.Label(result));
+                }                
             }
-            
             else 
                 MessageBox.Show(ResultLabels.Label(CodeResultat.CompteIntrouvable));
         }

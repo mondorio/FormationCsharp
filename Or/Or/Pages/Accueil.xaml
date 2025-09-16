@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:Or.Pages"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="Accueil">
+      Title="Accueil" KeepAlive="True">
 
     <Grid>
         <TextBlock x:Name="Titre" HorizontalAlignment="Left" Margin="302,122,0,0" TextWrapping="Wrap" Text="BANQUE" VerticalAlignment="Top" FontSize="36" Background="White"/>

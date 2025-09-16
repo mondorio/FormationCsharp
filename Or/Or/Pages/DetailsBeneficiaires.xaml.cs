@@ -49,7 +49,7 @@ namespace Or.Pages
         {
             //Items.Clear();
             listView.Items.Clear();
-            // récupère comptes bénéficiaires
+            // récupère comptes bénéficiaires updated
             var beneficiaires = SqlRequests.ListeBeneficiairesPourCarte(NumCarte);
 
             foreach (var b in beneficiaires)
@@ -75,7 +75,7 @@ namespace Or.Pages
         }
         void PageFunction_Return(object sender, ReturnEventArgs<long> e)
         {
-            listView.ItemsSource = SqlRequests.ListeComptesAssociesCarte(NumCarte);
+            Refresh();
         }
 
 

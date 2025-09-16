@@ -30,12 +30,24 @@ namespace Or.Business
         static readonly string queryUpdateCompte = "UPDATE COMPTE SET Solde=Solde-@Montant WHERE IdtCpt=@IdtCompte";
         static readonly string queryTousLesComptes = @"SELECT IdtCpt, NumCarte, Solde, TypeCompte FROM Compte";
 
-        private const string queryBeneficiairesParCarteTitulaire = @"SELECT b.IdtCpt, cpt.NumCarte AS NumCarteBenef, crt.NomClient, crt.PrenomClient, cpt.Solde, cpt.TypeCompte FROM BENEFICIAIRE b JOIN COMPTE cpt ON cpt.IdtCpt = b.IdtCpt JOIN CARTE  crt ON crt.NumCarte = cpt.NumCarte WHERE b.NumCarte = @NumCarte ORDER BY crt.NomClient, crt.PrenomClient, b.IdtCpt;";                 
+        private const string queryBeneficiairesParCarteTitulaire = @"SELECT b.IdtCpt, cpt.NumCarte AS NumCarteBenef, crt.NomClient, crt.PrenomClient, cpt.Solde, cpt.TypeCompte FROM BENEFICIAIRE b JOIN COMPTE cpt ON cpt.IdtCpt = b.IdtCpt JOIN CARTE  crt ON crt.NumCarte = cpt.NumCarte WHERE b.NumCarte = @NumCarte ORDER BY crt.NomClient, crt.PrenomClient, b.IdtCpt;";
         private const string queryAjoutBenef = @"INSERT INTO BENEFICIAIRE (NumCarte, IdtCpt) VALUES (@NumCarte, @IdtCpt);";
         private const string querySupprBenef = @"DELETE FROM BENEFICIAIRE WHERE NumCarte = @NumCarte AND IdtCpt = @IdtCpt;";
-      private const string queryCompteExisteEtElig = @"SELECT CASE WHEN EXISTS ( SELECT 1 FROM COMPTE c JOIN CARTE ca ON ca.NumCarte = c.NumCarte  WHERE c.IdtCpt = @IdtCpt) THEN 1 ELSE 0 END;";
+        private const string queryBeneficiairePotentiel = @"SELECT CASE WHEN EXISTS 
+                                                ( SELECT 1 FROM COMPTE c JOIN CARTE ca ON ca.NumCarte = c.NumCarte WHERE c.IdtCpt = @IdtCpt AND c.TypeCompte = 'Courant' )
+                                AND NOT EXISTS ( SELECT 1 FROM BENEFICIAIRE b WHERE b.NumCarte = @NumCarte AND b.IdtCpt   = @IdtCpt ) THEN 1 ELSE 0 END;";
+        private const string queryListVirementPossible = @"SELECT DISTINCT Id, IdentifiantCarte, TypeDuCompte, Solde
+                                                         FROM ( SELECT c.IdtCpt AS Id, c.NumCarte AS IdentifiantCarte, c.TypeCompte AS TypeDuCompte, c.Solde
+                                                                FROM COMPTE c
+                                                                WHERE c.NumCarte = @NumCarte AND c.TypeCompte IN ('Courant','Livret')
+                                                                UNION ALL
+                                                                SELECT c2.IdtCpt AS Id, c2.NumCarte AS IdentifiantCarte, c2.TypeCompte AS TypeDuCompte, c2.Solde
+                                                                FROM BENEFICIAIRE b
+                                                                JOIN COMPTE c2 ON c2.IdtCpt = b.IdtCpt
+                                                                WHERE b.NumCarte = @NumCarte)
+                                                         ORDER BY Id ASC ;";
 
-        private const string queryExisteBenef = @" SELECT EXISTS( SELECT 1 FROM BENEFICIAIRE WHERE NumCarte = @NumCarte AND IdtCpt = @IdtCpt );";
+
 
         /// <summary>
         /// Obtention des infos d'une carte
@@ -109,6 +121,10 @@ namespace Or.Business
             return idtTransac;
         }
 
+        /// <summary>
+        /// recup tout les comptes de la base
+        /// </summary>
+        /// <returns></returns>
         public static List<Compte> ListeTousLesComptesCarte()
         {
             var comptes = new List<Compte>();
@@ -121,7 +137,7 @@ namespace Or.Business
                 using (var command = new SqliteCommand(queryTousLesComptes, connection))
                 {
 
-                   // command.Parameters.AddWithValue("@NumCarte", NumCarte);
+                    // command.Parameters.AddWithValue("@NumCarte", NumCarte);
 
                     using (var reader = command.ExecuteReader())
                     {
@@ -341,7 +357,7 @@ namespace Or.Business
 
             Operation typeOpe = Tools.TypeTransaction(trans.Expediteur, trans.Destinataire);
 
-            if (typeOpe != Operation.DepotSimple && typeOpe != Operation.RetraitSimple )
+            if (typeOpe != Operation.DepotSimple && typeOpe != Operation.RetraitSimple)
             {
                 return false;
             }
@@ -517,7 +533,12 @@ namespace Or.Business
 
             return updateCompte;
         }
-
+        
+        /// <summary>
+        /// retourne la liste des beneficiaire pour cette carte 
+        /// </summary>
+        /// <param name="numCarte">numero carte</param>
+        /// <returns></returns>
         public static List<BeneficiaireRow> ListeBeneficiairesPourCarte(long numCarte)
         {
             var rows = new List<BeneficiaireRow>();
@@ -539,7 +560,7 @@ namespace Or.Business
 
                 rows.Add(new BeneficiaireRow
                 {
-                    Id = idtCpt,    
+                    Id = idtCpt,
                     Nom = nom,
                     Prenom = prenom,
                     NumeroCompte = idtCpt,
@@ -547,67 +568,80 @@ namespace Or.Business
             }
             return rows;
         }
-        /*public static List<Carte> ListeCartesAssocieesClient(long numCarte)
-        {
-            var cartes = new List<Carte>();
-            var cnx = new SqliteConnection(ConstructionConnexionString(fileDb));
-            cnx.Open();
 
-            var cmd = new SqliteCommand(queryListeBenef, cnx);
-            cmd.Parameters.AddWithValue("@NumCarte", numCarte);
-
-            var rd = cmd.ExecuteReader();
-            while (rd.Read())
-            { 
-                long num = rd.GetInt64(0);
-                string nom = rd.GetString(1);
-                string prenom = rd.GetString(2);
-
-                cartes.Add(new Carte( num,nom,prenom ));
-
-            }
-            return cartes;
-        }*/
-
+        /// <summary>
+        /// si le compte est courant et que le beneficiaire n'ai pas déja ajouter pour cette carte return true
+        /// </summary>
+        /// <param name="numCarte">numero carte</param>
+        /// <param name="idtCpt">numero compte</param>
+        /// <returns></returns>
         public static bool EstBeneficiairePotentiel(long numCarte, int idtCpt)
         {
             var cnx = new SqliteConnection(ConstructionConnexionString(fileDb));
             cnx.Open();
 
-            // Le compte existe et est lié à une carte
-            using (var cmd = new SqliteCommand(queryCompteExisteEtElig, cnx))
-            {
-                cmd.Parameters.AddWithValue("@IdtCpt", idtCpt);
-                var exists = Convert.ToInt32(cmd.ExecuteScalar());
-                if (exists != 1) return false;
-            }
+            var cmd = new SqliteCommand(queryBeneficiairePotentiel, cnx);
+            cmd.Parameters.AddWithValue("@NumCarte", numCarte);
+            cmd.Parameters.AddWithValue("@IdtCpt", idtCpt);
 
-            // Pas déjà bénéficiaire pour cette carte
-            using (var cmd = new SqliteCommand(queryExisteBenef, cnx))
-            {
-                cmd.Parameters.AddWithValue("@NumCarte", numCarte);
-                cmd.Parameters.AddWithValue("@IdtCpt", idtCpt);
-                var already = Convert.ToInt32(cmd.ExecuteScalar());
-                if (already == 1) return false;
-            }
-
-            return true;
+            return Convert.ToInt32(cmd.ExecuteScalar()) == 1;
         }
 
-        public static void AjoutBeneficiaire(long numCarte, int idtCpt)
+        /// <summary>
+        /// retourne la liste des désitnataire et beneficiaire possible pour le virement d'une carte
+        /// </summary>
+        /// <param name="numCarte">numero carte</param>
+        /// <returns></returns>
+        public static List<Compte> ListeVirementPossible(long numCarte)
+        {
+            var list = new List<Compte>();
+            var cnx = new SqliteConnection(ConstructionConnexionString(fileDb));
+            cnx.Open();
+
+            var cmd = new SqliteCommand(queryListVirementPossible, cnx);
+            cmd.Parameters.AddWithValue("@NumCarte", numCarte);
+
+            var rd = cmd.ExecuteReader();
+            while (rd.Read())
+            {
+                int id = rd.GetInt32(0);
+                long identCarte = rd.GetInt64(1);
+                string typeStr = rd.GetString(2);
+                decimal solde = Convert.ToDecimal(rd.GetValue(3), System.Globalization.CultureInfo.InvariantCulture);
+
+                var type = Enum.TryParse<TypeCompte>(typeStr, true, out var t) ? t : (typeStr.Equals("Courant") ? TypeCompte.Courant : TypeCompte.Livret);
+
+                list.Add(new Compte(id, identCarte, type, solde));
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// ajoute un beneficiaire pour un compte et un numero de carte donnée
+        /// </summary>
+        /// <param name="numCarte">numero carte</param>
+        /// <param name="idtCpt">numero Compte</param>
+        /// <returns></returns>
+        public static CodeResultat AjoutBeneficiaire(long numCarte, int idtCpt)
         {
             var cnx = new SqliteConnection(ConstructionConnexionString(fileDb));
             cnx.Open();
 
             if (!EstBeneficiairePotentiel(numCarte, idtCpt))
-                throw new InvalidOperationException("Saisie bénéficiaire invalide.");
+                return CodeResultat.BenefAlreadyOrDontExist;
 
             var cmd = new SqliteCommand(queryAjoutBenef, cnx);
             cmd.Parameters.AddWithValue("@NumCarte", numCarte);
             cmd.Parameters.AddWithValue("@IdtCpt", idtCpt);
             cmd.ExecuteNonQuery();
+            return CodeResultat.Ok;
         }
 
+        /// <summary>
+        /// suprime le befeiciaire d'un compte et une carte donnée
+        /// </summary>
+        /// <param name="numCarte">numero carte</param>
+        /// <param name="idtCpt">numero compte</param>
         public static void SuppressionBeneficiaire(long numCarte, int idtCpt)
         {
             var cnx = new SqliteConnection(ConstructionConnexionString(fileDb));

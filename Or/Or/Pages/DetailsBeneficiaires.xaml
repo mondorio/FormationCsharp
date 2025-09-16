@@ -9,7 +9,7 @@ xmlns:models="clr-namespace:Or.Models"
 x:TypeArguments="sys:Int64"
         xmlns:Business="clr-namespace:Or.Business" x:Class="Or.Pages.DetailsBeneficiaires"
         mc:Ignorable="d"
-        Title="DetailsBeneficiaires" Height="450" Width="800">
+        Title="DetailsBeneficiaires" KeepAlive="True" Height="450" Width="800">
     <Grid>
 
         <TextBlock x:Name="Titre" HorizontalAlignment="Left" Margin="29,51,0,0" TextWrapping="Wrap" Text="Détails Beneficiaires" VerticalAlignment="Top" FontSize="20"/>
