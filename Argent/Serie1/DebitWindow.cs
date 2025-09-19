@@ -22,7 +22,7 @@ namespace Argent.Serie1
         /// <returns></returns>
         public bool CanDebit(DateTime now, decimal amount, int plafond)
         {
-            getPlafond(now);
+            GetPlafond(now);
             return sum + amount <= plafond;
         }
 
@@ -40,7 +40,7 @@ namespace Argent.Serie1
         /// récupére le plafond encore possible en fonction des 10 dérnier jour
         /// </summary>
         /// <param name="now"></param>
-        private void getPlafond(DateTime now)
+        private void GetPlafond(DateTime now)
         {
             var min = now - Window;   
             while (start < ops.Count && ops[start].date <= min)
