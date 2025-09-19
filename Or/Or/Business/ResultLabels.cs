@@ -36,6 +36,7 @@ namespace Or.Business
 
     public static class ResultLabels
     {
+        // OK - exhaustif
         public static string Label(CodeResultat code)  
         {
             switch (code)

@@ -53,8 +53,14 @@ namespace Or.Pages
             }
             else
             {
-                if (montant <= 0) MessageBox.Show(ResultLabels.Label(CodeResultat.MontantNegatifOuZero));
-                else MessageBox.Show(ResultLabels.Label(CodeResultat.MontantInvalide));
+                if (montant <= 0)
+                {
+                    MessageBox.Show(ResultLabels.Label(CodeResultat.MontantNegatifOuZero));
+                }
+                else
+                {
+                    MessageBox.Show(ResultLabels.Label(CodeResultat.MontantInvalide));
+                }
 
             }
         }

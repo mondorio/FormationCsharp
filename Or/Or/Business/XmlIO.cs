@@ -19,16 +19,23 @@ namespace Or.Business
     {
         static string filePath = "C:\\INTM\\FormationCsharp\\Or\\Or\\Files\\";
 
-        [XmlRoot("Compte")]
+        [XmlRoot("Comptes")]
+        public class ListXMLCompte
+        {
+            [XmlElement("Compte", typeof(XMLCompte))]
+            public List<XMLCompte> Liste { get; set; }
+        }
+
+        [XmlType("Compte")]
         public class XMLCompte
         {
-            [XmlAttribute("Identifiant")]
+            [XmlElement("Identifiant")]
             public int Id { get; set; }
 
-            [XmlAttribute("Type")]
+            [XmlElement("Type")]
             public TypeCompte Type { get; set; }
 
-            [XmlAttribute("Solde")]
+            [XmlElement("Solde")]
             public string Solde { get; set; }
 
             [XmlArray("Transactions")]
@@ -38,25 +45,47 @@ namespace Or.Business
 
         public class XMLTransaction
         {
-            [XmlAttribute("Identifiant")]
+            [XmlElement("Identifiant")]
             public int Id { get; set; }
 
             // format: DD/MM/YYYY HH:mm:ss
-            [XmlAttribute("Date")]
+            [XmlIgnore]
             public DateTime Date { get; set; }
 
-            [XmlAttribute("Type")]
+            [XmlElement("Date")]
+            public string DateString
+            {
+                get => Date.ToString("dd/MM/yyyy HH:mm:ss");
+                set => DateTime.Parse(value);
+            }
+
+            [XmlElement("Type")]
             public string Type { get; set; }
 
             // présents ou non selon le type
-            [XmlAttribute("CompteExpediteur")]
+            [XmlIgnore]
             public int CompteExpediteur { get; set; }
 
-            [XmlAttribute("CompteDestinataire")]
+            // Bonne façon de faire
+            [XmlElement("CompteExpediteur")]
+            public string CompteExpediteurString
+            {
+                get => (CompteExpediteur == 0) ? null : CompteExpediteur.ToString();
+                set { CompteExpediteur = (value == null) ? 0 : int.Parse(value); }
+            }
+
+            [XmlIgnore]
             public int CompteDestinataire { get; set; }
 
+            [XmlElement("CompteDestinataire")]
+            public string CompteDestinataireString
+            {
+                get => (CompteDestinataire == 0) ? null : CompteDestinataire.ToString();
+                set { CompteDestinataire = (value == null) ? 0 : int.Parse(value); }
+            }
+
             // Montant absolu
-            [XmlAttribute("Montant")]
+            [XmlElement("Montant")]
             public string Montant { get; set; }
         }
 
@@ -86,11 +115,10 @@ namespace Or.Business
             if (comptes == null) return CodeResultat.CompteIntrouvable;
 
 
-            List<XMLCompte> exportList = new List<XMLCompte>();
+            ListXMLCompte exportList = new ListXMLCompte() { Liste = new List<XMLCompte>()};
 
 
-
-            //on parcour nos compte
+            // on parcourt nos comptes
             foreach (Compte c in comptes)
             {
                 XMLCompte cptXML = new XMLCompte
@@ -104,7 +132,7 @@ namespace Or.Business
                 if (Transactions == null) return CodeResultat.ErreurInconnue;
 
                 var triTransac = Transactions.OrderByDescending(t => t.Horodatage).Take(10); //GetRange(0,10) prend les 10 premiers après trie
-                //on parcours nos transaction pour les lier à nos comptes
+                //on parcourt nos transaction pour les lier à nos comptes
                 foreach (var t in triTransac)
                 {
                     //creation de notre transaction
@@ -112,7 +140,7 @@ namespace Or.Business
                     {
                         Id = t.IdTransaction,
                         Date = t.Horodatage,
-                        Type = t.Type.ToString(),
+                        Type = t.Type == Operation.DepotSimple ? "Dépôt" : t.Type == Operation.RetraitSimple ? "Retrait" : "Virement",
                         Montant = FormatMoney(t.Montant)
                     };
 
@@ -126,14 +154,14 @@ namespace Or.Business
                     cptXML.Transactions.Add(TransactionXML);
                 }
 
-                exportList.Add(cptXML);
+                exportList.Liste.Add(cptXML);
             }
             try
             {
                 filePath += numCarte.ToString();
 
 
-                var serializer = new XmlSerializer(typeof(List<XMLCompte>));
+                var serializer = new XmlSerializer(typeof(ListXMLCompte));
 
                 using (var writer = new StreamWriter(filePath, append: false, Encoding.UTF8))
                 {
