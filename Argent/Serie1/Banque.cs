@@ -120,7 +120,8 @@ namespace Argent.Serie1
              string Fmt(Transaction t, bool ok, string reason = "")
                 //=> $"{t.idTransact}:{(ok ? "OK" : "KO")};{t.date:dd/MM/yyyy HH:mm:ss};" +
                 //   $"{t.montant};{t.senderId};{t.recipientId};{reason}";
-                => $"{t.IdTransact}:{(ok ? "OK" : "KO")};";
+                // Correction, tu dois avoir ID;OK ou ID;KO
+                => $"{t.IdTransact};{(ok ? "OK" : "KO")}";
 
             // Sécurité sur l'horodatage. OK
             foreach (var transaction in _transactions.OrderBy(t => t.Date))

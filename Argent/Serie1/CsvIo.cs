@@ -202,7 +202,8 @@ namespace Argent.Serie1
         {
             if (!HeaderDone)
             {
-                File.WriteAllText(path, "id;date;montant;expediteur;reception\n");
+                // Pas d'en-tête dans le fichier de sortie
+                //File.WriteAllText(path, "id;date;montant;expediteur;reception\n");
                 HeaderDone = true;
             }
             File.AppendAllText(path, $"{line}\n");
