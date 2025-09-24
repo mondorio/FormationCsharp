@@ -13,7 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp", "..\Interface\WpfA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Or", "..\Or\Or\Or.csproj", "{8E58D626-3838-4CDA-8C69-B9C0386E35D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Percolation", "..\..\..\Users\Formation\Downloads\Percolation\Percolation.csproj", "{8A365A19-46A9-41CB-9251-B10D7EBA7453}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Percolation", "..\Percolation\Percolation.csproj", "{8A365A19-46A9-41CB-9251-B10D7EBA7453}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BanqueAccount", "..\BanqueAccount\BanqueAccount.csproj", "{55983A4A-44AA-46E4-A192-F83DB4334A87}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{8A365A19-46A9-41CB-9251-B10D7EBA7453}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A365A19-46A9-41CB-9251-B10D7EBA7453}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A365A19-46A9-41CB-9251-B10D7EBA7453}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55983A4A-44AA-46E4-A192-F83DB4334A87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55983A4A-44AA-46E4-A192-F83DB4334A87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55983A4A-44AA-46E4-A192-F83DB4334A87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55983A4A-44AA-46E4-A192-F83DB4334A87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

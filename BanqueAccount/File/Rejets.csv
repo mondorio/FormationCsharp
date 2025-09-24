@@ -1,0 +1,41 @@
+id;status;
+1:OK;01/09/2025 10:00:00;200,00;0;2;
+2:KO;date erronée
+3:KO;date erronée
+4:KO;date erronée
+5:KO;date erronée
+6:OK;01/09/2025 10:00:00;200,00;0;2;
+7:KO;information manquante
+8:KO;information manquante
+8:KO;information manquante
+1001:OK;01/09/2025 10:00:00;200,00;0;1;
+1002:KO;01/09/2025 11:00:00;100,00;1;0;Plafond dépassé
+1003:OK;02/09/2025 09:30:00;300,00;1;2;
+1004:OK;02/09/2025 12:00:00;200,00;1;3;
+1005:OK;03/09/2025 08:00:00;50,00;2;4;
+1006:KO;04/09/2025 10:00:00;200,00;3;0;Plafond dépassé
+1007:OK;04/09/2025 10:10:00;100,00;3;10;
+1008:KO;05/09/2025 09:00:00;1000,00;5;6;Solde insuffisant
+1009:KO;06/09/2025 14:00:00;1500,00;6;5;Solde insuffisant
+1010:OK;06/09/2025 14:05:00;800,00;6;7;
+1011:KO;12/09/2025 10:00:00;500,00;1;7;Plafond dépassé
+1012:KO;date erronée
+1013:KO;07/09/2025 08:00:00;-20,00;1;0;Montant <= 0
+1014:KO;Compte non trouver
+1015:KO;Compte non trouver
+1016:KO;date erronée
+1017:KO;montant erronée
+1018:KO;montant erronée
+1019:KO;destinataire erronée
+1020:OK;01/09/2025 10:00:00;200,00;12;4;
+1021:OK;06/10/2025 08:00:00;200,00;3;1;
+1022:OK;16/10/2025 08:00:00;200,00;3;1;
+1023:OK;17/10/2025 08:00:00;400,00;3;1;
+1024:KO;18/10/2025 08:00:00;600,00;3;1;Plafond dépassé
+1025:KO;19/10/2025 08:00:00;500,00;3;1;Plafond dépassé
+1026:KO;28/10/2025 08:00:00;900,00;3;1;Plafond dépassé
+1027:KO;19/10/2025 08:00:00;700,00;4;3;Solde insuffisant
+2000:OK;02/09/2025 12:00:00;200,00;1;4;
+:KO;mauvais id
+:KO;mauvais id
+101A:KO;mauvais id
