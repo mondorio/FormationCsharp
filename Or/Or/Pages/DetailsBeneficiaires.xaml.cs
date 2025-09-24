@@ -91,6 +91,7 @@ namespace Or.Pages
         }
     }
 
+    // Tu aurais pu mettre cette classe dans Models
     public class BeneficiaireRow
     {
         public int Id { get; set; }

@@ -16,7 +16,7 @@ Title="ConsultationCarte" KeepAlive="True" Height="538">
         <TextBlock x:Name="Titre2" HorizontalAlignment="Left" Margin="99,218,0,0" TextWrapping="Wrap" Text="n° de compte de beneficiaire" VerticalAlignment="Top" FontSize="13" FontWeight="SemiBold"/>
         <TextBox x:Name="InputCPT" HorizontalAlignment="Left" Margin="99,243,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Height="22" Background="#FFD2D0D0"/>
 
-        <Button Content="Ajouter" Margin="465,237,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Ajouter_click" Width="180" Background="#FFDDDDDD"/>
+        <Button Content="Ajouter" Margin="465,237,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Ajouter_Click" Width="180" Background="#FFDDDDDD"/>
         <Button Content="Retour" Margin="68,335,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Retour_Click" Width="180" Background="#FFDDDDDD"/>
 
     </Grid>

@@ -34,8 +34,9 @@ namespace Or.Pages
         }
 
 
-        private void Ajouter_click(object sender, RoutedEventArgs e)
+        private void Ajouter_Click(object sender, RoutedEventArgs e)
         {
+            // Code propre
             if (int.TryParse(InputCPT.Text.Trim(), out int cpt))
             {
                 CodeResultat result = SqlRequests.AjoutBeneficiaire(NumCarte, cpt);

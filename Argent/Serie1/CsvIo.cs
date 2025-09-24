@@ -1,12 +1,6 @@
 ﻿using Argent.Enum;
-using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
 
 namespace Argent.Serie1
 {
@@ -43,7 +37,8 @@ namespace Argent.Serie1
                     if (!int.TryParse(parts[1].Trim(), out plafond))
                         continue;
                 }
-                // récupére l'id du compte
+                // récupére l'id du compte - en principe, tu pourrais mettre ce code (et celui dans LoadCompte) dans une 
+                // méthode commune 
                 if (parts[0].Length == 16 && !string.IsNullOrWhiteSpace(parts[1]) && parts[0].All(char.IsDigit))
                 {
                     if (!long.TryParse(parts[0].Trim(), Inv, out numCpt))
@@ -53,7 +48,7 @@ namespace Argent.Serie1
 
                 if (seen.Contains(numCpt)) continue;
                 plafond = (plafond / 100) * 100;
-                plafond = (plafond is >= 500 and <= 3000) ? plafond : 500;
+                plafond = (plafond is >= 500 and <= 3000) ? plafond : 500; // approche fonctionnelle ! :)
 
                 if (bank.AddCard(numCpt, plafond)) seen.Add(numCpt);
             }
@@ -82,9 +77,16 @@ namespace Argent.Serie1
                 string typeStr = parts[2].Trim();
                 //check du type
                 AccountType type;
-                if (string.Equals(typeStr, "Courant", StringComparison.OrdinalIgnoreCase)) type = AccountType.Courant;
-                else if (string.Equals(typeStr, "Livret", StringComparison.OrdinalIgnoreCase)) type = AccountType.Livret;
-                else continue; // type invalide 
+                // C'est correct, précis, mais peut-être trop, moins facilement maintenable, mais OK
+                if (string.Equals(typeStr, "Courant", StringComparison.OrdinalIgnoreCase))
+                {
+                    type = AccountType.Courant;
+                }
+                else if (string.Equals(typeStr, "Livret", StringComparison.OrdinalIgnoreCase))
+                {
+                    type = AccountType.Livret;
+                }
+                else { continue; }// type invalide 
 
                 decimal initial = 0;
                 if (parts.Length >= 4 && !string.IsNullOrWhiteSpace(parts[3]))
@@ -93,7 +95,7 @@ namespace Argent.Serie1
                     if (!decimal.TryParse(parts[3].Trim(), out initial)) continue;
                     if (initial < 0) continue;
                 }
-                // recupe le numero de carte 
+                // recupe le numero de carte - peut-être refactoriser cette expression booléenne dans une méthode privée renvoyant un booléen
                 if (parts[1].Length == 16 && !string.IsNullOrWhiteSpace(parts[1]) && parts[1].All(char.IsDigit))
                 {
                     if (!long.TryParse(parts[1].Trim(), Inv, out cardNumb)) continue;
@@ -107,7 +109,7 @@ namespace Argent.Serie1
         }
 
         /// <summary>
-        /// récupére nos transaction sur le fichier transactions et fait un premier trie sur les lignes en KO 
+        /// Récupére nos transaction sur le fichier transactions et fait un premier trie sur les lignes en KO 
         /// </summary>
         /// <param name="path"></param>
         /// <param name="pathS"></param>
@@ -124,6 +126,10 @@ namespace Argent.Serie1
                //=> $"{line}:KO;{reason}";
                => $"{line}:KO;";
 
+            // Pour le débogage, WriteLine n'est pas forcément le plus adapté.
+            // Tu peux utiliser Debug.WriteLine()
+
+            // HashSet<int>, intéressant
             var seen = new HashSet<int>();
             foreach (var line in File.ReadLines(path))
             {
@@ -135,6 +141,7 @@ namespace Argent.Serie1
                 if (parts.Length < 5)
                 {// verifie qu'on a bien toute les info
                     rejet.Add(Fmt(parts[0].Trim(), "information manquante"));
+                    Debug.WriteLine(Fmt(parts[0].Trim(), "information manquante"), pathS); // un exemple 
                     //WriteFile(Fmt(parts[0].Trim(), "information manquante"), pathS);
                     continue;
                 }
@@ -195,7 +202,8 @@ namespace Argent.Serie1
         {
             if (!HeaderDone)
             {
-                File.WriteAllText(path, "id;date;montant;expediteur;reception\n");
+                // Pas d'en-tête dans le fichier de sortie
+                //File.WriteAllText(path, "id;date;montant;expediteur;reception\n");
                 HeaderDone = true;
             }
             File.AppendAllText(path, $"{line}\n");

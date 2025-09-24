@@ -15,18 +15,18 @@ namespace Argent
             
             if(CsvIo.LoadCards(pathCards, banque))
             {
-                banque.afficheCarte();
+                banque.AfficheCarte();
             }
 
             Console.WriteLine();
             if (CsvIo.LoadAccounts(pathAccounts, banque))
             {
-                banque.afficheAccounts();
+                banque.AfficheAccounts();
             }
             Console.WriteLine();
             if (CsvIo.LoadTransaction(pathTransaction, pathSortie, banque, out rejet))
             {
-                banque.afficheTransactios();
+                banque.AfficheTransactions();
             }
 
             var list = banque.TraiterTransactions(pathSortie);
@@ -40,6 +40,8 @@ namespace Argent
                 Console.WriteLine(transaction);
             }
         }
+
+        // Une classe statique Tools pourrait être intéressante 
 
         /// <summary>
         /// permet de trié 2 liste de string sur l'id.

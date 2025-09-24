@@ -1,26 +1,20 @@
 ﻿using Argent.Enum;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
 
 namespace Argent.Serie1
 {
     public class Banque
     {
-        private List<Carte> cards = new();   
-        private List<Compte> accounts = new();
-        private List<Transaction> transactions = new();
+        // Pour les types complexes, par référence on préférera les initialiser dans le constructeur
+        private List<Carte> _cards;   
+        private List<Compte> _accounts;
+        private List<Transaction> _transactions;
         //private Dictionary<long, DebitWindow> debit = new(); //liste de debit par numero de carte
 
         public Banque()
         {
-
+            _cards = new List<Carte>();
+            _accounts = new List<Compte>();
+            _transactions = new List<Transaction>();
         }
 
         /// <summary>
@@ -32,18 +26,18 @@ namespace Argent.Serie1
         public bool AddCard(long number, int plafond)
         {
             Carte card = new Carte(number, plafond);
-            if (cards.Contains(card)) return false;
-            else cards.Add(card);
+            if (_cards.Contains(card)) return false;
+            else _cards.Add(card);
             return true;
         }
         /// <summary>
         /// affiche nos carte 
         /// </summary>
-        public void afficheCarte()
+        public void AfficheCarte()
         {
-            foreach(var carte in cards)
+            foreach(var carte in _cards)
             {
-                Console.WriteLine(carte.idCarte + " " + carte.plafond);
+                Console.WriteLine(carte.IdCarte + " " + carte.Plafond);
             }
         }
         /// <summary>
@@ -63,7 +57,7 @@ namespace Argent.Serie1
             if (carte is null) return false;                        // la carte doit exister
 
             var acc = new Compte(id, cardNumber, type, initialBalance );
-            accounts.Add(acc);
+            _accounts.Add(acc);
             carte.AddCpt(acc);                                      
             return true;
         }
@@ -71,16 +65,16 @@ namespace Argent.Serie1
         /// <summary>
         /// affiche les comptes
         /// </summary>
-        public void afficheAccounts()
+        public void AfficheAccounts()
         {
-            foreach (var account in accounts)
+            foreach (var account in _accounts)
             {
-                Console.WriteLine(account.idCpt + " " + account.numcarte + " " + account.type + " " + account.solde);
+                Console.WriteLine(account.IdCpt + " " + account.Numcarte + " " + account.Type + " " + account.Solde);
             }
         }
 
         /// <summary>
-        /// ajoute une transaction a notre liste et vérifie qu'il est conforme au attente .
+        /// Ajoute une transaction à notre liste et vérifie qu'il est conforme au attente .
         /// </summary>
         /// <param name="id"></param>
         /// <param name="date"></param>
@@ -97,17 +91,17 @@ namespace Argent.Serie1
             if (!senderOk || !recipientOk) return false;
 
             var transac = new Transaction(id, date, montant, senderId, recipientId);
-            transactions.Add(transac);
+            _transactions.Add(transac);
             return true;
         }
         /// <summary>
         /// affichage transac
         /// </summary>
-        public void afficheTransactios()
+        public void AfficheTransactions() // pourquoi pas DisplayTransactions() ? On évite le mélange francais anglais
         {
-            foreach (var transac in transactions)
+            foreach (var transac in _transactions)
             {
-                Console.WriteLine(transac.idTransact + " " + transac.date + " " + transac.montant + " " + transac.recipientId + " " + transac.senderId);
+                Console.WriteLine(transac.IdTransact + " " + transac.Date + " " + transac.Montant + " " + transac.RecipientId + " " + transac.SenderId);
             }
         }
         /// <summary>
@@ -117,8 +111,8 @@ namespace Argent.Serie1
         /// <returns></returns>
         public List<string> TraiterTransactions(string pathSortie)
         {   //pour optimiser la recherche on crée un dictionnaire avec les listes key : id
-            var compteById = accounts.ToDictionary(a => a.idCpt);
-            var carteByNum = cards.ToDictionary(c => c.idCarte);
+            var compteById = _accounts.ToDictionary(a => a.IdCpt);
+            var carteByNum = _cards.ToDictionary(c => c.IdCarte);
 
             var results = new List<string>();
             var seen = new HashSet<int>();
@@ -126,78 +120,79 @@ namespace Argent.Serie1
              string Fmt(Transaction t, bool ok, string reason = "")
                 //=> $"{t.idTransact}:{(ok ? "OK" : "KO")};{t.date:dd/MM/yyyy HH:mm:ss};" +
                 //   $"{t.montant};{t.senderId};{t.recipientId};{reason}";
-                => $"{t.idTransact}:{(ok ? "OK" : "KO")};";
+                // Correction, tu dois avoir ID;OK ou ID;KO
+                => $"{t.IdTransact};{(ok ? "OK" : "KO")}";
 
-
-            foreach (var transaction in transactions.OrderBy(t => t.date))
+            // Sécurité sur l'horodatage. OK
+            foreach (var transaction in _transactions.OrderBy(t => t.Date))
             {
                 bool ok = false;
                 string reason = "";
 
                 // 0001 - validations pour être sur
                 //doublon
-                if (!seen.Add(transaction.idTransact))
+                if (!seen.Add(transaction.IdTransact))
                 { results.Add(Fmt(transaction, false, "Id dupliqué")); continue; }
                 //montant sup a 0
-                if (transaction.montant <= 0m)
+                if (transaction.Montant <= 0m)
                 { results.Add(Fmt(transaction, false, "Montant <= 0")); continue; }
                 //pas de double 0
-                if (transaction.senderId == 0 && transaction.recipientId == 0)
+                if (transaction.SenderId == 0 && transaction.RecipientId == 0)
                 { results.Add(Fmt(transaction, false, "0->0 interdit")); continue; }
 
-                if (transaction.senderId == 0)
+                if (transaction.SenderId == 0)
                 {
                     // 0002 - DEPOT: 0 -> Compte
-                    if (compteById.TryGetValue(transaction.recipientId, out var recp))
+                    if (compteById.TryGetValue(transaction.RecipientId, out var recp))
                     {
-                        recp.Deposit(transaction.montant);
+                        recp.Deposit(transaction.Montant);
                         ok = true;
                     }
                     else reason = "Destinataire inexistant";
                 }
-                else if (transaction.recipientId == 0)
+                else if (transaction.RecipientId == 0)
                 {
                     // 0003 - RETRAIT: Compte -> 0 (solde + plafond 10j)
-                    if (!compteById.TryGetValue(transaction.senderId, out var send))
+                    if (!compteById.TryGetValue(transaction.SenderId, out var send))
                         reason = "Expéditeur inexistant";
-                    else if (!carteByNum.TryGetValue(send.numcarte, out var sCard))
+                    else if (!carteByNum.TryGetValue(send.Numcarte, out var sCard))
                         reason = "Carte expéditeur introuvable";
-                    else if (!send.CanWithdraw(transaction.montant))
+                    else if (!send.CanWithdraw(transaction.Montant))
                         reason = "Solde insuffisant";
-                    else if (!sCard.WindowFor().CanDebit(transaction.date, transaction.montant, sCard.plafond))
+                    else if (!sCard.WindowFor().CanDebit(transaction.Date, transaction.Montant, sCard.Plafond))
                         reason = "Plafond 10j dépassé";
                     else
                     {
-                        send.Withdraw(transaction.montant);
-                        sCard.WindowFor().Record(transaction.date, transaction.montant);
+                        send.Withdraw(transaction.Montant);
+                        sCard.WindowFor().Record(transaction.Date, transaction.Montant);
                         ok = true;
                     }
                 }
                 else
                 {
                     // 0004 - VIREMENT: Compte -> Compte 
-                    if (!compteById.TryGetValue(transaction.senderId, out var sAcc))
+                    if (!compteById.TryGetValue(transaction.SenderId, out var sAcc))
                         reason = "Expéditeur inexistant";
-                    else if (!compteById.TryGetValue(transaction.recipientId, out var rAcc))
+                    else if (!compteById.TryGetValue(transaction.RecipientId, out var rAcc))
                         reason = "Destinataire inexistant";
-                    else if (!carteByNum.TryGetValue(sAcc.numcarte, out var sCard))
+                    else if (!carteByNum.TryGetValue(sAcc.Numcarte, out var sCard))
                         reason = "Carte expéditeur introuvable";
-                    else if (!carteByNum.TryGetValue(rAcc.numcarte, out var rCard))
+                    else if (!carteByNum.TryGetValue(rAcc.Numcarte, out var rCard))
                         reason = "Carte destinataire introuvable";
                     else
                     {
-                        bool sameCard = sCard.idCarte == rCard.idCarte;
-                        if (!sameCard && !(sAcc.type == AccountType.Courant && rAcc.type == AccountType.Courant)) //si c'est la meme carte ok sinon doit étre courant -> courant
+                        bool sameCard = sCard.IdCarte == rCard.IdCarte;
+                        if (!sameCard && !(sAcc.Type == AccountType.Courant && rAcc.Type == AccountType.Courant)) //si c'est la meme carte ok sinon doit étre courant -> courant
                             reason = "Transaction autorisé uniquement entre comptes Courants";
-                        else if (!sAcc.CanWithdraw(transaction.montant))
+                        else if (!sAcc.CanWithdraw(transaction.Montant))
                             reason = "Solde insuffisant";
-                        else if (!sCard.WindowFor().CanDebit(transaction.date, transaction.montant, sCard.plafond))
+                        else if (!sCard.WindowFor().CanDebit(transaction.Date, transaction.Montant, sCard.Plafond))
                             reason = "Plafond 10j dépassé";
                         else
                         {
-                            sAcc.Withdraw(transaction.montant);
-                            rAcc.Deposit(transaction.montant);
-                            sCard.WindowFor().Record(transaction.date, transaction.montant);
+                            sAcc.Withdraw(transaction.Montant);
+                            rAcc.Deposit(transaction.Montant);
+                            sCard.WindowFor().Record(transaction.Date, transaction.Montant);
                             ok = true;
                         }
                     }
@@ -217,7 +212,7 @@ namespace Argent.Serie1
         /// <param name="id">idCpt</param>
         /// <returns></returns>
         public Compte? GetCompteById(int id)
-         => accounts.Find(c => c.idCpt == id);
+         => _accounts.Find(c => c.IdCpt == id);
 
         /// <summary>
         /// regarde avec l'id de la carte si il existe, retourne le compte sinon null
@@ -225,7 +220,7 @@ namespace Argent.Serie1
         /// <param name="numero">idCarte</param>
         /// <returns></returns>
         public Carte? GetCarteByNumero(long numero)
-            => cards.Find(c => c.idCarte == numero);
+            => _cards.Find(c => c.IdCarte == numero);
 
     }
 }
